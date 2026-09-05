@@ -1,4 +1,8 @@
 import Image from "next/image";
+import { generateTrip } from "@/app/actions";
+import SubmitButton from "@/app/submit-button";
+
+export const maxDuration = 30;
 
 const scenes = [
   ["date", "♥", "约会"],
@@ -45,10 +49,10 @@ export default function HomePage() {
         <div className="hero-overlay"><small>中山 · 石岐</small><strong>完美金鹰 × 假日广场</strong></div>
       </section>
 
-      <form action="/trip" className="planner-form compact-planner">
+      <form action={generateTrip} className="planner-form compact-planner">
         <section className="prompt-card compact-prompt">
           <label htmlFor="request">今天想怎么玩？</label>
-          <input id="request" name="request" type="text" autoComplete="off" placeholder="带爸妈逛4小时，预算300元，想喝咖啡，少走路" />
+          <input id="request" name="request" type="text" maxLength={600} autoComplete="off" placeholder="带爸妈逛4小时，预算300元，想喝咖啡，少走路" />
         </section>
 
         <section className="section-block compact-section">
@@ -72,7 +76,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <button className="primary-button main-cta" type="submit">生成行程 <span>→</span></button>
+        <SubmitButton />
       </form>
 
       <section className="inspiration-section" id="inspiration">

@@ -287,3 +287,6 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
 }
+.primary-button:disabled { cursor: wait; opacity: .7; }
+.primary-button > [role="status"] { margin-left: 0; }
+.trip-hero .planning-status { font-size: 14px; margin-bottom: 8px; }

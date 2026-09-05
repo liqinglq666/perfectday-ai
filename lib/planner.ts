@@ -12,6 +12,18 @@ const sceneCopy: Record<Scene, { title: string; subtitle: string }> = {
 
 const budgetCap: Record<Budget, number> = { "100": 100, "300": 300, "500": 500, plus: 800 };
 
+export function isScene(value: unknown): value is Scene {
+  return typeof value === "string" && Object.hasOwn(sceneCopy, value);
+}
+
+export function isBudget(value: unknown): value is Budget {
+  return typeof value === "string" && Object.hasOwn(budgetCap, value);
+}
+
+export function isWalking(value: unknown): value is PlanInput["walking"] {
+  return value === "normal" || value === "low";
+}
+
 const templates: Record<Scene, string[]> = {
   date: ["holiday-start", "boya-bookstore", "daka-coffee", "connector", "golden-food"],
   family: ["holiday-start", "boya-bookstore", "connector", "golden-family", "golden-food"],
@@ -104,6 +116,7 @@ function inferWalking(text: string, fallback: PlanInput["walking"]) {
 }
 
 function applyRequestHints(input: PlanInput): PlanInput {
+  if (input.intentSource === "bailian") return input;
   const text = input.request.trim();
   if (!text) return input;
 
@@ -150,11 +163,35 @@ function applyPlaceHints(items: Place[], request: string) {
   return result.filter((item, index, array) => array.findIndex((candidate) => candidate.id === item.id) === index);
 }
 
+function applyResolvedPlaces(items: Place[], input: PlanInput) {
+  const excluded = new Set(input.excludedPlaceIds || []);
+  let result = items.filter((item) => !excluded.has(item.id));
+  for (const id of input.preferredPlaceIds || []) {
+    const place = places.find((item) => item.id === id);
+    if (!place || excluded.has(id) || result.some((item) => item.id === id)) continue;
+    const sameCategory = result.findIndex((item) => item.category === place.category &&
+      !input.preferredPlaceIds?.includes(item.id));
+    if (sameCategory >= 0) result[sameCategory] = place;
+    else result = insertBeforeFood(result, place);
+  }
+  if (input.indoorOnly || input.scene === "rain") result = result.filter((item) => item.indoor);
+  return result;
+}
+
+function orderByMall(items: Place[]) {
+  const holiday = items.filter((item) => item.mall === "假日广场");
+  const golden = items.filter((item) => item.mall !== "假日广场" && item.category !== "connector");
+  const connector = items.find((item) => item.category === "connector");
+  return [...holiday, ...(holiday.length && golden.length ? [connector || byId("connector")] : []), ...golden];
+}
+
 export function createPlan(rawInput: PlanInput): TripPlan {
   const input = applyRequestHints(rawInput);
   const copy = sceneCopy[input.scene];
   let selected = templates[input.scene].map(byId);
-  selected = applyPlaceHints(selected, input.request);
+  selected = input.intentSource === "bailian"
+    ? applyResolvedPlaces(selected, input)
+    : applyPlaceHints(selected, input.request);
 
   if (input.walking === "low") {
     selected = selected.map((item) => item.id === "connector"
@@ -162,8 +199,22 @@ export function createPlan(rawInput: PlanInput): TripPlan {
       : item);
   }
 
-  selected = fitBudget(selected, budgetCap[input.budget]);
-  selected = fitDuration(selected, input.duration);
+  // Model preferences are accepted only as known IDs; all place facts stay local.
+  if (input.intentSource === "bailian") {
+    selected = orderByMall(selected);
+    // The original rule planner keeps at least three stops. An AI route must also
+    // fit the user's limits when a preferred activity is long or expensive.
+    while (selected.length && (selected.reduce((sum, item) => sum + item.price, 0) > budgetCap[input.budget] ||
+        selected.reduce((sum, item) => sum + item.duration + item.walkMinutes, 0) > input.duration)) {
+      const optional = selected.findLastIndex((item) => item.category !== "connector" &&
+        !input.preferredPlaceIds?.includes(item.id));
+      selected.splice(optional >= 0 ? optional : selected.length - 1, 1);
+      selected = orderByMall(selected);
+    }
+  } else {
+    selected = fitBudget(selected, budgetCap[input.budget]);
+    selected = fitDuration(selected, input.duration);
+  }
 
   let elapsed = 0;
   const stops: TripStop[] = selected.map((item) => {
@@ -174,7 +225,7 @@ export function createPlan(rawInput: PlanInput): TripPlan {
 
   return {
     title: copy.title,
-    subtitle: copy.subtitle,
+    subtitle: selected.length ? copy.subtitle : "当前地点库没有符合这些条件的安排，请放宽条件后重新规划。",
     stops,
     totalMinutes: elapsed,
     totalPrice: stops.reduce((sum, item) => sum + item.price, 0),
@@ -244,19 +295,33 @@ export function adjustPlan(input: PlanInput, change: AdjustmentChange): TripPlan
   };
 }
 
-export function parseInput(params: Record<string, string | string[] | undefined>): PlanInput {
+export function parseInput(params: Record<string, string | string[] | undefined>, inferRequest = true): PlanInput {
   const value = (key: string, fallback: string) => {
     const raw = params[key];
     return typeof raw === "string" ? raw : fallback;
   };
 
-  return applyRequestHints({
-    request: value("request", ""),
-    scene: value("scene", "friends") as Scene,
-    duration: Number(value("duration", "240")),
-    budget: value("budget", "500") as Budget,
-    walking: value("walking", "low") as PlanInput["walking"]
-  });
+  const scene = value("scene", "friends");
+  const duration = Number(value("duration", "240"));
+  const budget = value("budget", "500");
+  const walking = value("walking", "low");
+  const source = value("ai", "");
+  const ids = (key: string) => [...new Set(value(key, "").slice(0, 600).split(","))]
+    .filter((id) => places.some((place) => place.id === id));
+  const input: PlanInput = {
+    request: value("request", "").slice(0, 600),
+    scene: isScene(scene) ? scene : "friends",
+    duration: Number.isFinite(duration) ? Math.max(90, Math.min(480, Math.round(duration))) : 240,
+    budget: isBudget(budget) ? budget : "500",
+    walking: isWalking(walking) ? walking : "low",
+    ...(source === "bailian" ? {
+      intentSource: "bailian" as const,
+      preferredPlaceIds: ids("preferred"),
+      excludedPlaceIds: ids("excluded"),
+      indoorOnly: value("indoor", "0") === "1"
+    } : source === "fallback" ? { intentSource: "fallback" as const } : {})
+  };
+  return inferRequest ? applyRequestHints(input) : input;
 }
 
 export function parseChange(value: string | string[] | undefined): AdjustmentChange | null {
@@ -272,5 +337,11 @@ export function queryString(input: PlanInput) {
     budget: input.budget,
     walking: input.walking
   });
+  if (input.intentSource) params.set("ai", input.intentSource);
+  if (input.intentSource === "bailian") {
+    if (input.preferredPlaceIds?.length) params.set("preferred", input.preferredPlaceIds.join(","));
+    if (input.excludedPlaceIds?.length) params.set("excluded", input.excludedPlaceIds.join(","));
+    if (input.indoorOnly) params.set("indoor", "1");
+  }
   return params.toString();
 }

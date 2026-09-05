@@ -24,7 +24,7 @@ export default async function AdjustPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="page adjust-page">
-      <header className="topbar"><Link href={`/trip?${base}`} aria-label="返回行程">‹</Link><strong>调整行程</strong><span /></header>
+      <header className="topbar"><Link href={`/trip?${base}${change ? `&change=${change}` : ""}`} aria-label="返回行程">‹</Link><strong>调整行程</strong><span /></header>
 
       <section className="change-panel">
         <div className="section-heading"><h2>现在需要调整什么？</h2></div>

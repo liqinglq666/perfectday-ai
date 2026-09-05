@@ -11,6 +11,10 @@ export interface PlanInput {
   duration: number;
   budget: Budget;
   walking: Walking;
+  intentSource?: "bailian" | "fallback";
+  preferredPlaceIds?: string[];
+  excludedPlaceIds?: string[];
+  indoorOnly?: boolean;
 }
 
 export interface Place {

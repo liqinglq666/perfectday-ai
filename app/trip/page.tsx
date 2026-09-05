@@ -52,6 +52,7 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
       {change && <div className="applied-banner">✓ {changeLabels[change]}</div>}
 
       <section className="trip-hero">
+        <p className="planning-status">{input.intentSource === "bailian" ? "已按 AI 理解的偏好规划" : input.intentSource === "fallback" ? "AI 暂时不可用，已使用基础规划" : "基础路线规划"}</p>
         <h1>{plan.title}</h1>
         <p>{plan.subtitle}</p>
         <div className="metrics">
