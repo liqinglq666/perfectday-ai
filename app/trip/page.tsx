@@ -26,6 +26,18 @@ const changeLabels = {
   queue: "已替换排队餐厅"
 };
 
+const activityLabels: Record<string, string> = {
+  start: "集合",
+  culture: "逛逛",
+  coffee: "咖啡",
+  food: "吃饭",
+  shopping: "逛店",
+  family: "亲子",
+  rest: "休息",
+  connector: "换区",
+  activity: "玩一会"
+};
+
 export default async function TripPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
   const input = parseInput(params);
@@ -35,7 +47,7 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="page trip-page">
-      <header className="topbar"><Link href="/" aria-label="返回">‹</Link><strong>你的行程</strong><span>PerfectDay</span></header>
+      <header className="topbar"><Link href="/" aria-label="返回">‹</Link><strong>你的行程</strong><span /></header>
 
       {change && <div className="applied-banner">✓ {changeLabels[change]}</div>}
 
@@ -49,21 +61,23 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
         </div>
       </section>
 
-      <div className="route-note">地点已核验 · 消费为规划估算</div>
-
-      <section className="timeline">
+      <section className="timeline compact-timeline">
         {plan.stops.map((stop, index) => (
           <article className="stop-row" key={`${stop.id}-${index}`}>
-            <div className="time-col"><strong>{stop.time}</strong><span>{stop.duration}分钟</span><i /></div>
-            <div className="stop-card visual-stop-card">
+            <div className="time-col"><strong>{stop.time}</strong><span>{stop.duration}分</span><i /></div>
+            <div className="stop-card visual-stop-card compact-stop-card">
               <div className="place-visual">
-                <Image src={stop.visual} alt="" width={112} height={142} sizes="112px" />
+                <Image src={stop.visual} alt="" width={96} height={120} sizes="96px" />
                 <span className="visual-number">{String(index + 1).padStart(2, "0")}</span>
               </div>
               <div className="stop-content">
                 <div className="place-meta"><span>{stop.mall} · {stop.floor}</span></div>
-                <div className="stop-title"><h2>{stop.name}</h2><strong>{stop.price ? `约 ¥${stop.price}` : "¥0"}</strong></div>
-                <p>{stop.note}</p>
+                <div className="stop-title"><h2>{stop.name}</h2><strong>{stop.price ? `约 ¥${stop.price}` : "免费"}</strong></div>
+                <div className="stop-facts">
+                  <span>{activityLabels[stop.category] || "逛逛"}</span>
+                  {stop.indoor && <span>室内</span>}
+                  {stop.walkMinutes > 0 && <span>步行 {stop.walkMinutes} 分</span>}
+                </div>
                 <div className="stop-actions">
                   <a target="_blank" rel="noreferrer" href={amapSearchUrl(stop.searchKeyword || `${stop.name} ${stop.address}`)}>⌖ 高德地图</a>
                 </div>
@@ -74,8 +88,8 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
       </section>
 
       <div className="sticky-actions">
-        <Link className="secondary-button" href={`/adjust?${qs}${change ? `&change=${change}` : ""}`}>调整行程</Link>
-        <Link className="primary-button compact" href="/">重新规划</Link>
+        <Link className="primary-button compact" href={`/adjust?${qs}${change ? `&change=${change}` : ""}`}>调整行程</Link>
+        <Link className="secondary-button" href="/">重新规划</Link>
       </div>
     </div>
   );

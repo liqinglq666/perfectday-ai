@@ -1,12 +1,12 @@
 import Image from "next/image";
 
 const scenes = [
-  ["date", "♥", "约会", "浪漫时光"],
-  ["family", "◈", "亲子", "快乐遛娃"],
-  ["parents", "♧", "陪爸妈", "轻松舒适"],
-  ["friends", "●●", "朋友聚会", "吃喝玩乐"],
-  ["solo", "☕", "独处", "享受自我"],
-  ["rain", "☂", "雨天室内", "自在不受限"]
+  ["date", "♥", "约会"],
+  ["family", "◈", "亲子"],
+  ["parents", "♧", "陪爸妈"],
+  ["friends", "●●", "朋友"],
+  ["solo", "☕", "独处"],
+  ["rain", "☂", "雨天"]
 ];
 
 const inspirations = [
@@ -42,35 +42,33 @@ export default function HomePage() {
 
       <section className="hero-card visual-hero">
         <Image className="hero-image" src="/visuals/hero-dual-mall.svg" alt="完美金鹰与假日广场双商圈" fill priority sizes="430px" />
-        <div className="hero-overlay"><strong>完美金鹰 × 假日广场，一次逛顺</strong></div>
+        <div className="hero-overlay"><small>中山 · 石岐</small><strong>完美金鹰 × 假日广场</strong></div>
       </section>
 
-      <div className="location-pill">⌖ 中山 · 完美金鹰 × 假日广场 <span>已连通</span></div>
-
-      <form action="/trip" className="planner-form">
-        <section className="prompt-card">
+      <form action="/trip" className="planner-form compact-planner">
+        <section className="prompt-card compact-prompt">
           <label htmlFor="request">今天想怎么玩？</label>
-          <textarea id="request" name="request" placeholder="例如：带爸妈逛4小时，预算300元，想喝咖啡，少走路" />
+          <input id="request" name="request" type="text" autoComplete="off" placeholder="带爸妈逛4小时，预算300元，想喝咖啡，少走路" />
         </section>
 
-        <section className="section-block">
+        <section className="section-block compact-section">
           <div className="section-heading"><h2>和谁一起？</h2></div>
-          <div className="scene-grid">
-            {scenes.map(([value, icon, label, sub], index) => (
+          <div className="scene-grid compact-scenes">
+            {scenes.map(([value, icon, label], index) => (
               <label className="scene-option" key={value}>
                 <input type="radio" name="scene" value={value} defaultChecked={index === 3} />
-                <span className="scene-card"><b>{icon}</b><strong>{label}</strong><small>{sub}</small></span>
+                <span className="scene-card"><b>{icon}</b><strong>{label}</strong></span>
               </label>
             ))}
           </div>
         </section>
 
-        <section className="section-block">
+        <section className="section-block compact-section">
           <div className="section-heading"><h2>今天的节奏</h2></div>
           <div className="preferences">
             <label><small>◷ 时长</small><select name="duration" defaultValue="240"><option value="120">2小时</option><option value="240">4小时</option><option value="360">6小时</option></select></label>
-            <label><small>¥ 预算</small><select name="budget" defaultValue="500"><option value="100">¥100以内</option><option value="300">¥100-300</option><option value="500">¥300-500</option><option value="plus">¥500+</option></select></label>
-            <label><small>♙ 步行</small><select name="walking" defaultValue="low"><option value="normal">正常走</option><option value="low">少走路</option></select></label>
+            <label><small>¥ 预算</small><select name="budget" defaultValue="500"><option value="100">¥100内</option><option value="300">¥100-300</option><option value="500">¥300-500</option><option value="plus">¥500+</option></select></label>
+            <label><small>♙ 步行</small><select name="walking" defaultValue="low"><option value="normal">正常</option><option value="low">少走路</option></select></label>
           </div>
         </section>
 
