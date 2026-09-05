@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./enhancements.css";
 
 export const metadata: Metadata = {
   title: "PerfectDay AI",
