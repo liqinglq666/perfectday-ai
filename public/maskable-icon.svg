@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="PerfectDay AI maskable icon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fffaf0"/>
+      <stop offset="1" stop-color="#ead8b9"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#e5bd6c"/>
+      <stop offset="1" stop-color="#b97d27"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <circle cx="256" cy="218" r="76" fill="url(#sun)"/>
+  <path d="M256 116V82M181 142l-22-26M331 142l22-26M151 211h-34M361 211h34" stroke="#c89538" stroke-width="15" stroke-linecap="round"/>
+  <rect x="120" y="304" width="272" height="31" rx="15.5" fill="#171717"/>
+  <rect x="158" y="354" width="196" height="20" rx="10" fill="#c89538"/>
+  <path d="M204 412c35-15 69-15 104 0" fill="none" stroke="#8e6321" stroke-width="11" stroke-linecap="round" opacity=".72"/>
+</svg>
