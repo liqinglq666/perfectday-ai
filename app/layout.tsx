@@ -13,8 +13,7 @@ export const metadata: Metadata = {
     title: "PerfectDay"
   },
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg"
+    icon: "/icon.svg"
   }
 };
 
