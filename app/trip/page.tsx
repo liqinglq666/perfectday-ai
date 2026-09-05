@@ -7,6 +7,17 @@ function formatMinutes(value: number) {
   return h ? `${h}小时${m ? `${m}分` : ""}` : `${m}分钟`;
 }
 
+function amapSearchUrl(keyword: string) {
+  const params = new URLSearchParams({
+    keyword,
+    city: "中山市",
+    view: "map",
+    src: "perfectday-ai",
+    callnative: "1"
+  });
+  return `https://uri.amap.com/search?${params.toString()}`;
+}
+
 export default async function TripPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const input = parseInput(await searchParams);
   const plan = createPlan(input);
@@ -37,7 +48,7 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
                 <div className="stop-title"><div><small>{stop.mall} · {stop.floor}</small><h2>{stop.name}</h2></div><strong>{stop.price ? `¥${stop.price}` : "¥0"}</strong></div>
                 <p>{stop.note}</p>
                 <div className="stop-actions">
-                  <a target="_blank" rel="noreferrer" href={`https://uri.amap.com/marker?position=${stop.lng},${stop.lat}&name=${encodeURIComponent(stop.name)}&coordinate=gaode&callnative=1`}>⌖ 导航</a>
+                  <a target="_blank" rel="noreferrer" href={amapSearchUrl(stop.mall)}>⌖ 高德查看</a>
                   <span>第 {index + 1}/{plan.stops.length} 站</span>
                 </div>
               </div>
