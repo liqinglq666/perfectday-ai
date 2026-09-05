@@ -20,10 +20,10 @@ function amapSearchUrl(keyword: string) {
 }
 
 const changeLabels = {
-  rain: "已切换为更适合雨天的室内路线",
-  walk: "已进一步减少不必要步行",
-  budget: "已减少一项可选消费",
-  queue: "已避开当前排队餐厅"
+  rain: "已切换为更适合雨天的路线",
+  walk: "已减少不必要步行",
+  budget: "已降低可选消费",
+  queue: "已替换排队餐厅"
 };
 
 export default async function TripPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -35,12 +35,11 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="page trip-page">
-      <header className="topbar"><Link href="/" aria-label="返回">‹</Link><strong>PerfectDay AI</strong><span>好逛 · 好吃</span></header>
+      <header className="topbar"><Link href="/" aria-label="返回">‹</Link><strong>你的行程</strong><span>PerfectDay</span></header>
 
       {change && <div className="applied-banner">✓ {changeLabels[change]}</div>}
 
       <section className="trip-hero">
-        <div className="eyebrow">YOUR PERFECT HALF DAY</div>
         <h1>{plan.title}</h1>
         <p>{plan.subtitle}</p>
         <div className="metrics">
@@ -50,7 +49,7 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
         </div>
       </section>
 
-      <div className="route-note"><span>● 已核验核心地点</span><span>消费为规划估算，实际以门店为准</span></div>
+      <div className="route-note">地点已核验 · 消费为规划估算</div>
 
       <section className="timeline">
         {plan.stops.map((stop, index) => (
@@ -62,13 +61,11 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
                 <span className="visual-number">{String(index + 1).padStart(2, "0")}</span>
               </div>
               <div className="stop-content">
-                <div className="place-meta"><span>{stop.mall} · {stop.floor}</span>{stop.verified && <b>已核验</b>}</div>
+                <div className="place-meta"><span>{stop.mall} · {stop.floor}</span></div>
                 <div className="stop-title"><h2>{stop.name}</h2><strong>{stop.price ? `约 ¥${stop.price}` : "¥0"}</strong></div>
                 <p>{stop.note}</p>
-                <div className="source-line">{stop.sourceLabel ? `来源：${stop.sourceLabel}` : "商圈公共信息"}</div>
                 <div className="stop-actions">
-                  <a target="_blank" rel="noreferrer" href={amapSearchUrl(stop.searchKeyword || `${stop.name} ${stop.address}`)}>⌖ 高德查看</a>
-                  <span>第 {index + 1}/{plan.stops.length} 站</span>
+                  <a target="_blank" rel="noreferrer" href={amapSearchUrl(stop.searchKeyword || `${stop.name} ${stop.address}`)}>⌖ 高德地图</a>
                 </div>
               </div>
             </div>
@@ -77,8 +74,8 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
       </section>
 
       <div className="sticky-actions">
-        <Link className="secondary-button" href={`/adjust?${qs}${change ? `&change=${change}` : ""}`}>☷ 调整行程</Link>
-        <Link className="primary-button compact" href="/">↻ 重新生成</Link>
+        <Link className="secondary-button" href={`/adjust?${qs}${change ? `&change=${change}` : ""}`}>调整行程</Link>
+        <Link className="primary-button compact" href="/">重新规划</Link>
       </div>
     </div>
   );

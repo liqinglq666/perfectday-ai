@@ -36,27 +36,25 @@ export default function HomePage() {
       <header className="brand-row">
         <div>
           <div className="brand">PerfectDay <span>AI</span><sup>✦</sup></div>
-          <p>一键生成你的商圈完美半日</p>
+          <p>一键生成你的商圈半日路线</p>
         </div>
-        <div className="product-badge"><strong>直接用</strong><small>无需登录</small></div>
       </header>
 
       <section className="hero-card visual-hero">
         <Image className="hero-image" src="/visuals/hero-dual-mall.svg" alt="完美金鹰与假日广场双商圈" fill priority sizes="430px" />
-        <div className="hero-overlay"><span>中山城市生活新路线</span><strong>一边逛文化，一边逛生活</strong></div>
+        <div className="hero-overlay"><strong>完美金鹰 × 假日广场，一次逛顺</strong></div>
       </section>
 
       <div className="location-pill">⌖ 中山 · 完美金鹰 × 假日广场 <span>已连通</span></div>
 
       <form action="/trip" className="planner-form">
         <section className="prompt-card">
-          <div className="prompt-label-row"><label htmlFor="request">告诉我你今天想怎么玩…</label><span>可选</span></div>
-          <textarea id="request" name="request" placeholder="例如：带爸妈逛4小时，预算300元，想喝咖啡，不想走太多路" />
-          <p className="input-tip">“约会 / 亲子 / 爸妈 / 下雨 / 预算 / 小时 / 少走路 / 瑞幸 / 盲盒 / 家居”等关键词都会影响路线。</p>
+          <label htmlFor="request">今天想怎么玩？</label>
+          <textarea id="request" name="request" placeholder="例如：带爸妈逛4小时，预算300元，想喝咖啡，少走路" />
         </section>
 
         <section className="section-block">
-          <div className="section-heading"><h2>快速选择你的场景</h2><span>不想打字也可以直接选</span></div>
+          <div className="section-heading"><h2>和谁一起？</h2></div>
           <div className="scene-grid">
             {scenes.map(([value, icon, label, sub], index) => (
               <label className="scene-option" key={value}>
@@ -68,21 +66,19 @@ export default function HomePage() {
         </section>
 
         <section className="section-block">
-          <div className="section-heading"><h2>设置偏好条件</h2><span>三个选项就够了</span></div>
+          <div className="section-heading"><h2>今天的节奏</h2></div>
           <div className="preferences">
-            <label><small>◷ 游玩时长</small><select name="duration" defaultValue="240"><option value="120">2小时</option><option value="240">4小时</option><option value="360">6小时</option></select></label>
-            <label><small>¥ 预算范围</small><select name="budget" defaultValue="500"><option value="100">¥100以内</option><option value="300">¥100-300</option><option value="500">¥300-500</option><option value="plus">¥500+</option></select></label>
-            <label><small>♙ 步行偏好</small><select name="walking" defaultValue="low"><option value="normal">正常走</option><option value="low">少走路</option></select></label>
+            <label><small>◷ 时长</small><select name="duration" defaultValue="240"><option value="120">2小时</option><option value="240">4小时</option><option value="360">6小时</option></select></label>
+            <label><small>¥ 预算</small><select name="budget" defaultValue="500"><option value="100">¥100以内</option><option value="300">¥100-300</option><option value="500">¥300-500</option><option value="plus">¥500+</option></select></label>
+            <label><small>♙ 步行</small><select name="walking" defaultValue="low"><option value="normal">正常走</option><option value="low">少走路</option></select></label>
           </div>
         </section>
 
-        <button className="primary-button main-cta" type="submit">✦ 生成我的 PerfectDay <span>→</span></button>
+        <button className="primary-button main-cta" type="submit">生成行程 <span>→</span></button>
       </form>
 
-      <div className="trust-row"><span>✓ 核验核心地点</span><span>✓ 高德免费查看</span><span>✓ 不强制注册</span></div>
-
       <section className="inspiration-section" id="inspiration">
-        <div className="section-heading"><h2>路线灵感</h2><span>点一下直接生成，不是演示页</span></div>
+        <div className="section-heading"><h2>路线灵感</h2></div>
         <div className="inspiration-scroll">
           {inspirations.map((item) => (
             <a className="inspiration-card" href={item.href} key={item.title}>
@@ -94,16 +90,9 @@ export default function HomePage() {
       </section>
 
       <section className="pwa-tip">
-        <div><b>⌂</b><span><strong>可以加到手机主屏幕</strong><small>浏览器菜单 → 添加到主屏幕，打开更像 App。</small></span></div>
-        <em>PWA</em>
+        <div><b>⌂</b><span><strong>添加到主屏幕</strong><small>下次打开更方便。</small></span></div>
+        <span className="pwa-arrow">→</span>
       </section>
-
-      <section className="promise-card" id="why">
-        <strong>不是把一天排满，而是让你更轻松地做决定。</strong>
-        <p>首版只做好路线、时间、预算、地点和临时调整。消费金额是规划估算，门店实际信息以现场与官方页面为准。</p>
-      </section>
-
-      <nav className="bottom-nav"><a className="active" href="/">⌂<span>首页</span></a><a href="#inspiration">▤<span>路线灵感</span></a><a href="#why">♡<span>为什么</span></a></nav>
     </div>
   );
 }

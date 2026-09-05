@@ -174,7 +174,7 @@ export function createPlan(rawInput: PlanInput): TripPlan {
 
   return {
     title: copy.title,
-    subtitle: input.request.trim() ? `已理解：${input.request.trim()} · ${copy.subtitle}` : copy.subtitle,
+    subtitle: copy.subtitle,
     stops,
     totalMinutes: elapsed,
     totalPrice: stops.reduce((sum, item) => sum + item.price, 0),
@@ -223,7 +223,7 @@ export function adjustPlan(input: PlanInput, change: AdjustmentChange): TripPlan
           verified: true,
           sourceLabel: "商圈公共区域",
           sourceUrl: "https://www.zsnews.cn/trade/index/view/cateid/45/id/698538.html",
-          note: "MVP 不伪造实时排队数据：如果当前餐厅排队过久，改为到商场餐饮区现场选择无需久等的门店。"
+          note: "当前餐厅排队过久时，优先到商场餐饮区现场选择等待更短的门店。"
         }
       : stop);
   }
