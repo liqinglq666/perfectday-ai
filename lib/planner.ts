@@ -44,7 +44,7 @@ function fitBudget(items: Place[], cap: number) {
     let candidatePrice = -1;
 
     result.forEach((item, index) => {
-      if (item.price > candidatePrice && item.category !== "start" && item.category !== "connector") {
+      if (item.price > candidatePrice && item.category !== "start" && item.category !== "connector" && item.category !== "family") {
         candidateIndex = index;
         candidatePrice = item.price;
       }
@@ -116,10 +116,45 @@ function applyRequestHints(input: PlanInput): PlanInput {
   };
 }
 
+function insertBeforeFood(items: Place[], place: Place) {
+  if (items.some((item) => item.id === place.id)) return items;
+  const foodIndex = items.findIndex((item) => item.category === "food");
+  const next = [...items];
+  next.splice(foodIndex >= 0 ? foodIndex : next.length, 0, place);
+  return next;
+}
+
+function applyPlaceHints(items: Place[], request: string) {
+  const text = request.trim();
+  if (!text) return items;
+
+  let result = [...items];
+
+  if (/运动|台球|保龄|射箭|游戏|主机|VR|互动|潮玩馆/.test(text)) {
+    const activity = byId("dayu-player");
+    const cultureIndex = result.findIndex((item) => item.category === "culture");
+    if (cultureIndex >= 0) result[cultureIndex] = activity;
+    else result = insertBeforeFood(result, activity);
+  }
+
+  if (/瑞幸|便宜点的咖啡|性价比咖啡|咖啡便宜/.test(text)) {
+    result = result.map((item) => item.category === "coffee" ? byId("luckin-coffee") : item);
+  } else if (/星巴克/.test(text)) {
+    result = result.map((item) => item.category === "coffee" ? byId("golden-coffee") : item);
+  }
+
+  if (/泡泡玛特|盲盒|潮玩/.test(text)) result = insertBeforeFood(result, byId("popmart"));
+  if (/宜得利|家居|家装|生活方式店/.test(text)) result = insertBeforeFood(result, byId("nitori"));
+  if (/盒马|超市|生鲜|买菜|伴手礼/.test(text)) result = insertBeforeFood(result, byId("hema"));
+
+  return result.filter((item, index, array) => array.findIndex((candidate) => candidate.id === item.id) === index);
+}
+
 export function createPlan(rawInput: PlanInput): TripPlan {
   const input = applyRequestHints(rawInput);
   const copy = sceneCopy[input.scene];
   let selected = templates[input.scene].map(byId);
+  selected = applyPlaceHints(selected, input.request);
 
   if (input.walking === "low") {
     selected = selected.map((item) => item.id === "connector"
@@ -182,6 +217,7 @@ export function adjustPlan(input: PlanInput, change: AdjustmentChange): TripPlan
           name: "石岐万象汇 · 餐饮区现场备选",
           floor: "餐饮楼层",
           address: "中山市石岐区孙文东路28号中山石岐万象汇",
+          searchKeyword: "中山石岐万象汇 餐饮",
           price: 90,
           status: "replaced",
           verified: true,
