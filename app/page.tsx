@@ -7,6 +7,8 @@ const scenes = [
   ["rain", "☂", "雨天室内", "自在不受限"]
 ];
 
+const sampleTrip = "/trip?scene=friends&duration=240&budget=500&walking=low&request=%E5%92%8C%E6%9C%8B%E5%8F%8B%E9%80%9B%E8%A1%97%E5%90%83%E9%A5%AD%EF%BC%8C4%E5%B0%8F%E6%97%B6%EF%BC%8C%E9%A2%84%E7%AE%97300-500%EF%BC%8C%E8%BF%98%E6%83%B3%E5%96%9D%E5%92%96%E5%95%A1";
+
 export default function HomePage() {
   return (
     <div className="page home-page">
@@ -15,25 +17,26 @@ export default function HomePage() {
           <div className="brand">PerfectDay <span>AI</span><sup>✦</sup></div>
           <p>一键生成你的商圈完美半日</p>
         </div>
-        <div className="weather">☀ <strong>26°</strong><small>今天适合出发</small></div>
+        <div className="product-badge"><strong>直接用</strong><small>无需登录</small></div>
       </header>
 
       <section className="hero-card">
-        <div className="mall mall-left"><span>完美金鹰</span><small>时尚生活新主场</small></div>
+        <div className="mall mall-left"><span>完美金鹰</span><small>品质消费与生活方式</small></div>
         <div className="hero-copy">一座城<br/>两种精彩<em>让每一天都更完美</em></div>
-        <div className="mall mall-right"><span>假日广场</span><small>城市乐享聚集地</small></div>
+        <div className="mall mall-right"><span>假日广场</span><small>文化 · 阅读 · 生活美学</small></div>
       </section>
 
-      <div className="location-pill">⌖ 中山 · 金鹰亚洲 × 假日广场 <span>⌄</span></div>
+      <div className="location-pill">⌖ 中山 · 完美金鹰 × 假日广场 <span>已连通</span></div>
 
       <form action="/trip" className="planner-form">
         <section className="prompt-card">
-          <label htmlFor="request">告诉我你今天想怎么玩…</label>
-          <textarea id="request" name="request" placeholder="例如：和朋友逛街吃饭，4小时，预算300-500，还想喝咖啡" />
+          <div className="prompt-label-row"><label htmlFor="request">告诉我你今天想怎么玩…</label><span>可选</span></div>
+          <textarea id="request" name="request" placeholder="例如：带爸妈逛4小时，预算300元，想喝咖啡，不想走太多路" />
+          <p className="input-tip">一句话里的“约会 / 亲子 / 爸妈 / 下雨 / 预算 / 小时 / 少走路”等信息，会直接影响路线。</p>
         </section>
 
         <section className="section-block">
-          <div className="section-heading"><h2>快速选择你的场景</h2><span>选一个最接近今天的你</span></div>
+          <div className="section-heading"><h2>快速选择你的场景</h2><span>不想打字也可以直接选</span></div>
           <div className="scene-grid">
             {scenes.map(([value, icon, label, sub], index) => (
               <label className="scene-option" key={value}>
@@ -56,12 +59,14 @@ export default function HomePage() {
         <button className="primary-button" type="submit">✦ 生成我的 PerfectDay <span>→</span></button>
       </form>
 
-      <section className="promise-card">
-        <strong>简单一点，反而更好用。</strong>
-        <p>首版只帮你做好路线、时间、预算和临时调整，不做复杂会员与室内导航。</p>
+      <div className="trust-row"><span>✓ 核验核心地点</span><span>✓ 高德免费查看</span><span>✓ 不强制注册</span></div>
+
+      <section className="promise-card" id="why">
+        <strong>不是把一天排满，而是让你更轻松地做决定。</strong>
+        <p>首版只做好路线、时间、预算、地点和临时调整。消费金额是规划估算，门店实际信息以现场与官方页面为准。</p>
       </section>
 
-      <nav className="bottom-nav"><a className="active" href="/">⌂<span>首页</span></a><a href="#how">▤<span>路线</span></a><a href="#about">♡<span>关于</span></a></nav>
+      <nav className="bottom-nav"><a className="active" href="/">⌂<span>首页</span></a><a href={sampleTrip}>▤<span>示例路线</span></a><a href="#why">♡<span>为什么</span></a></nav>
     </div>
   );
 }
