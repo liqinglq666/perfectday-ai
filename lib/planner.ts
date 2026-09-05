@@ -169,7 +169,7 @@ export function adjustPlan(input: PlanInput, change: AdjustmentChange): TripPlan
   if (change === "budget") {
     const paid = stops
       .map((stop, index) => ({ stop, index }))
-      .filter(({ stop }) => stop.price > 0 && stop.category !== "food")
+      .filter(({ stop }) => stop.price > 0 && stop.category !== "food" && stop.category !== "family")
       .sort((a, b) => b.stop.price - a.stop.price)[0];
 
     if (paid) stops = stops.filter((_, index) => index !== paid.index);
