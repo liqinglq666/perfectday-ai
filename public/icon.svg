@@ -1,6 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="120" fill="#F8F5EF"/>
-  <circle cx="256" cy="226" r="104" fill="#C89538"/>
-  <path d="M112 310h288" stroke="#171717" stroke-width="32" stroke-linecap="round"/>
-  <path d="M150 358h212" stroke="#C89538" stroke-width="20" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="PerfectDay AI">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffdf8"/><stop offset="1" stop-color="#efe3cd"/></linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e2ba68"/><stop offset="1" stop-color="#b87b25"/></linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="118" fill="url(#bg)"/>
+  <circle cx="256" cy="214" r="92" fill="url(#sun)"/>
+  <path d="M256 86V48M164 117l-24-31M348 117l24-31M117 198H74M395 198h43" stroke="#c89538" stroke-width="18" stroke-linecap="round"/>
+  <rect x="80" y="304" width="352" height="38" rx="19" fill="#171717"/>
+  <rect x="128" y="366" width="256" height="24" rx="12" fill="#c89538"/>
+  <path d="M181 429c50-21 101-21 151 0" fill="none" stroke="#8f6625" stroke-width="14" stroke-linecap="round" opacity=".75"/>
 </svg>
