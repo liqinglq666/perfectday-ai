@@ -85,23 +85,34 @@ export function adjustPlan(input: PlanInput, change: string): TripPlan {
   let stops: TripStop[] = base.stops.map((stop) => ({ ...stop, status: "kept" }));
 
   if (change === "rain") {
-    stops = stops.filter((stop) => stop.indoor || stop.category === "connector").map((stop) => ({ ...stop, status: stop.category === "connector" ? "shortened" : "kept" }));
+    stops = stops
+      .filter((stop) => stop.indoor || stop.category === "connector")
+      .map<TripStop>((stop) => ({
+        ...stop,
+        status: stop.category === "connector" ? "shortened" : "kept"
+      }));
   }
 
   if (change === "walk") {
-    stops = stops.map((stop) => stop.category === "connector" ? { ...stop, duration: 10, walkMinutes: 5, status: "shortened" } : stop);
+    stops = stops.map<TripStop>((stop) => stop.category === "connector"
+      ? { ...stop, duration: 10, walkMinutes: 5, status: "shortened" }
+      : stop);
   }
 
   if (change === "budget") {
-    stops = stops.map((stop) => stop.category === "food" || stop.category === "coffee" ? { ...stop, price: Math.round(stop.price * 0.72), status: "replaced", note: "切换为更高性价比的同类选择。" } : stop);
+    stops = stops.map<TripStop>((stop) => stop.category === "food" || stop.category === "coffee"
+      ? { ...stop, price: Math.round(stop.price * 0.72), status: "replaced", note: "切换为更高性价比的同类选择。" }
+      : stop);
   }
 
   if (change === "queue") {
-    stops = stops.map((stop) => stop.category === "food" ? { ...stop, name: "金鹰亚洲 · 就近餐饮备选", price: 90, status: "replaced", note: "避开当前排队点，优先选择附近无需久等的餐饮区域。" } : stop);
+    stops = stops.map<TripStop>((stop) => stop.category === "food"
+      ? { ...stop, name: "金鹰亚洲 · 就近餐饮备选", price: 90, status: "replaced", note: "避开当前排队点，优先选择附近无需久等的餐饮区域。" }
+      : stop);
   }
 
   let elapsed = 0;
-  stops = stops.map((stop) => {
+  stops = stops.map<TripStop>((stop) => {
     const next = { ...stop, time: toClock(elapsed) };
     elapsed += stop.duration + stop.walkMinutes;
     return next;
