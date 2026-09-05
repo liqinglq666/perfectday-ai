@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { adjustPlan, createPlan, parseChange, parseInput, queryString } from "@/lib/planner";
 
@@ -55,14 +56,18 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
         {plan.stops.map((stop, index) => (
           <article className="stop-row" key={`${stop.id}-${index}`}>
             <div className="time-col"><strong>{stop.time}</strong><span>{stop.duration}分钟</span><i /></div>
-            <div className="stop-card">
-              <div className={`place-art ${stop.accent}`}><span>{stop.icon}</span><small>{stop.mall}</small></div>
+            <div className="stop-card visual-stop-card">
+              <div className="place-visual">
+                <Image src={stop.visual} alt="" width={112} height={142} sizes="112px" />
+                <span className="visual-number">{String(index + 1).padStart(2, "0")}</span>
+              </div>
               <div className="stop-content">
                 <div className="place-meta"><span>{stop.mall} · {stop.floor}</span>{stop.verified && <b>已核验</b>}</div>
                 <div className="stop-title"><h2>{stop.name}</h2><strong>{stop.price ? `约 ¥${stop.price}` : "¥0"}</strong></div>
                 <p>{stop.note}</p>
+                <div className="source-line">{stop.sourceLabel ? `来源：${stop.sourceLabel}` : "商圈公共信息"}</div>
                 <div className="stop-actions">
-                  <a target="_blank" rel="noreferrer" href={amapSearchUrl(`${stop.name} ${stop.address}`)}>⌖ 高德查看</a>
+                  <a target="_blank" rel="noreferrer" href={amapSearchUrl(stop.searchKeyword || `${stop.name} ${stop.address}`)}>⌖ 高德查看</a>
                   <span>第 {index + 1}/{plan.stops.length} 站</span>
                 </div>
               </div>
