@@ -3,7 +3,7 @@ export type Budget = "100" | "300" | "500" | "plus";
 export type Walking = "normal" | "low";
 export type AdjustmentChange = "rain" | "walk" | "budget" | "queue";
 
-export type PlaceCategory = "start" | "culture" | "coffee" | "food" | "shopping" | "family" | "rest" | "connector";
+export type PlaceCategory = "start" | "culture" | "coffee" | "food" | "shopping" | "family" | "rest" | "connector" | "activity";
 
 export interface PlanInput {
   request: string;
@@ -28,7 +28,9 @@ export interface Place {
   note: string;
   icon: string;
   accent: string;
+  visual: string;
   verified: boolean;
+  searchKeyword?: string;
   sourceLabel?: string;
   sourceUrl?: string;
   lat?: number;
