@@ -1,0 +1,38 @@
+.product-badge {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  padding: 9px 11px;
+  border: 1px solid #eee7dc;
+  border-radius: 15px;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 8px 24px rgba(61,48,31,.05);
+}
+.product-badge strong { font-size: 11px; color: #9a6b22; }
+.product-badge small { font-size: 8px; color: #8e887f; }
+.prompt-label-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.prompt-label-row label { margin-bottom: 8px; }
+.prompt-label-row span { margin-bottom:8px; padding:4px 7px; border-radius:999px; background:#f5ead7; color:#9a6b22; font-size:8px; font-weight:800; }
+.input-tip { margin:9px 2px 0; color:#8a847b; font-size:9px; line-height:1.55; }
+.trust-row { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:16px; }
+.trust-row span { padding:9px 7px; border:1px solid #ece5da; border-radius:13px; background:rgba(255,255,255,.75); color:#756f67; text-align:center; font-size:8px; }
+.route-note { display:flex; justify-content:space-between; gap:10px; margin:12px 2px -3px; color:#8a847b; font-size:8px; line-height:1.4; }
+.route-note span:first-child { color:#2d7d5b; font-weight:800; white-space:nowrap; }
+.place-meta { display:flex; align-items:center; gap:6px; margin-bottom:3px; color:#a06e22; font-size:8px; }
+.place-meta span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.place-meta b { flex:0 0 auto; padding:3px 5px; border-radius:999px; background:#e7f5ed; color:#2f7f5e; font-size:7px; }
+.stop-title { align-items:flex-start; }
+.stop-title h2 { margin:0; flex:1; }
+.applied-banner { margin:0 0 12px; padding:10px 12px; border:1px solid #cfe7d9; border-radius:14px; background:#edf8f2; color:#2f7f5e; font-size:10px; font-weight:800; }
+.change-grid a span { display:grid; gap:2px; }
+.change-grid a span strong { font-size:10px; }
+.change-grid a span small { color:#8c867e; font-size:8px; font-weight:500; line-height:1.3; }
+.change-grid a.selected span small { color:#9a6b22; }
+@media (max-width: 360px) {
+  .brand { font-size:27px; }
+  .scene-grid { grid-template-columns:repeat(2,1fr); }
+  .preferences { grid-template-columns:1fr; }
+  .trust-row { grid-template-columns:1fr; }
+  .stop-card { grid-template-columns:64px 1fr; }
+  .place-art { min-height:120px; }
+}
