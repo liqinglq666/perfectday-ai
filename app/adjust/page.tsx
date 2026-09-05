@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { adjustPlan, parseChange, parseInput, queryString } from "@/lib/planner";
 
@@ -40,11 +41,11 @@ export default async function AdjustPage({ searchParams }: { searchParams: Promi
         <div className="replan-heading"><div><span>✦</span><h1>已为你重排路线</h1><p>只改必要部分，不伪造实时排队或室内导航数据。</p></div><em>更轻松<br/>更合适</em></div>
         <div className="metrics compact-metrics"><div><small>新总时长</small><strong>{Math.floor(plan.totalMinutes / 60)}小时{plan.totalMinutes % 60}分</strong></div><div><small>新预算</small><strong>¥{plan.totalPrice}</strong></div><div><small>步行</small><strong>{plan.totalWalkMinutes} 分</strong></div></div>
 
-        <div className="adjust-list">
+        <div className="adjust-list visual-adjust-list">
           {plan.stops.map((stop, index) => (
             <article key={`${stop.id}-${index}`}>
               <time>{stop.time}</time>
-              <div className={`mini-art ${stop.accent}`}>{stop.icon}</div>
+              <div className="adjust-thumb"><Image src={stop.visual} alt="" width={48} height={48} sizes="48px" /></div>
               <div><h3>{stop.name}</h3><p>{stop.note}</p></div>
               <span className={`status ${stop.status}`}>{statusLabel(stop.status)}</span>
             </article>
