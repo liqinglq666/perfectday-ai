@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const scenes = [
   ["date", "♥", "约会", "浪漫时光"],
   ["family", "◈", "亲子", "快乐遛娃"],
@@ -7,7 +9,26 @@ const scenes = [
   ["rain", "☂", "雨天室内", "自在不受限"]
 ];
 
-const sampleTrip = "/trip?scene=friends&duration=240&budget=500&walking=low&request=%E5%92%8C%E6%9C%8B%E5%8F%8B%E9%80%9B%E8%A1%97%E5%90%83%E9%A5%AD%EF%BC%8C4%E5%B0%8F%E6%97%B6%EF%BC%8C%E9%A2%84%E7%AE%97300-500%EF%BC%8C%E8%BF%98%E6%83%B3%E5%96%9D%E5%92%96%E5%95%A1";
+const inspirations = [
+  {
+    title: "文艺咖啡半日",
+    meta: "书店 · 咖啡 · 慢逛",
+    image: "/visuals/bookstore.svg",
+    href: "/trip?scene=solo&duration=240&budget=300&walking=low&request=%E6%83%B3%E9%80%9B%E4%B9%A6%E5%BA%97%E3%80%81%E5%96%9D%E5%92%96%E5%95%A1%EF%BC%8C%E8%BD%BB%E6%9D%BE%E4%B8%80%E7%82%B9"
+  },
+  {
+    title: "亲子轻松逛",
+    meta: "室内 · 遛娃 · 少走路",
+    image: "/visuals/family.svg",
+    href: "/trip?scene=family&duration=240&budget=500&walking=low&request=%E5%B8%A6%E5%AD%A9%E5%AD%90%E9%80%9B4%E5%B0%8F%E6%97%B6%EF%BC%8C%E5%B0%BD%E9%87%8F%E5%AE%A4%E5%86%85%EF%BC%8C%E5%B0%91%E8%B5%B0%E8%B7%AF"
+  },
+  {
+    title: "朋友潮玩路线",
+    meta: "互动 · 咖啡 · 晚餐",
+    image: "/visuals/activity.svg",
+    href: "/trip?scene=friends&duration=240&budget=500&walking=low&request=%E5%92%8C%E6%9C%8B%E5%8F%8B%E6%83%B3%E7%8E%A9%E6%B8%B8%E6%88%8F%E6%88%96%E8%BF%90%E5%8A%A8%EF%BC%8C%E5%86%8D%E5%96%9D%E5%92%96%E5%95%A1%E5%90%83%E6%99%9A%E9%A5%AD"
+  }
+];
 
 export default function HomePage() {
   return (
@@ -20,10 +41,9 @@ export default function HomePage() {
         <div className="product-badge"><strong>直接用</strong><small>无需登录</small></div>
       </header>
 
-      <section className="hero-card">
-        <div className="mall mall-left"><span>完美金鹰</span><small>品质消费与生活方式</small></div>
-        <div className="hero-copy">一座城<br/>两种精彩<em>让每一天都更完美</em></div>
-        <div className="mall mall-right"><span>假日广场</span><small>文化 · 阅读 · 生活美学</small></div>
+      <section className="hero-card visual-hero">
+        <Image className="hero-image" src="/visuals/hero-dual-mall.svg" alt="完美金鹰与假日广场双商圈" fill priority sizes="430px" />
+        <div className="hero-overlay"><span>中山城市生活新路线</span><strong>一边逛文化，一边逛生活</strong></div>
       </section>
 
       <div className="location-pill">⌖ 中山 · 完美金鹰 × 假日广场 <span>已连通</span></div>
@@ -32,7 +52,7 @@ export default function HomePage() {
         <section className="prompt-card">
           <div className="prompt-label-row"><label htmlFor="request">告诉我你今天想怎么玩…</label><span>可选</span></div>
           <textarea id="request" name="request" placeholder="例如：带爸妈逛4小时，预算300元，想喝咖啡，不想走太多路" />
-          <p className="input-tip">一句话里的“约会 / 亲子 / 爸妈 / 下雨 / 预算 / 小时 / 少走路”等信息，会直接影响路线。</p>
+          <p className="input-tip">“约会 / 亲子 / 爸妈 / 下雨 / 预算 / 小时 / 少走路 / 瑞幸 / 盲盒 / 家居”等关键词都会影响路线。</p>
         </section>
 
         <section className="section-block">
@@ -56,17 +76,34 @@ export default function HomePage() {
           </div>
         </section>
 
-        <button className="primary-button" type="submit">✦ 生成我的 PerfectDay <span>→</span></button>
+        <button className="primary-button main-cta" type="submit">✦ 生成我的 PerfectDay <span>→</span></button>
       </form>
 
       <div className="trust-row"><span>✓ 核验核心地点</span><span>✓ 高德免费查看</span><span>✓ 不强制注册</span></div>
+
+      <section className="inspiration-section" id="inspiration">
+        <div className="section-heading"><h2>路线灵感</h2><span>点一下直接生成，不是演示页</span></div>
+        <div className="inspiration-scroll">
+          {inspirations.map((item) => (
+            <a className="inspiration-card" href={item.href} key={item.title}>
+              <Image src={item.image} alt="" width={180} height={112} />
+              <div><strong>{item.title}</strong><span>{item.meta}</span></div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="pwa-tip">
+        <div><b>⌂</b><span><strong>可以加到手机主屏幕</strong><small>浏览器菜单 → 添加到主屏幕，打开更像 App。</small></span></div>
+        <em>PWA</em>
+      </section>
 
       <section className="promise-card" id="why">
         <strong>不是把一天排满，而是让你更轻松地做决定。</strong>
         <p>首版只做好路线、时间、预算、地点和临时调整。消费金额是规划估算，门店实际信息以现场与官方页面为准。</p>
       </section>
 
-      <nav className="bottom-nav"><a className="active" href="/">⌂<span>首页</span></a><a href={sampleTrip}>▤<span>示例路线</span></a><a href="#why">♡<span>为什么</span></a></nav>
+      <nav className="bottom-nav"><a className="active" href="/">⌂<span>首页</span></a><a href="#inspiration">▤<span>路线灵感</span></a><a href="#why">♡<span>为什么</span></a></nav>
     </div>
   );
 }
