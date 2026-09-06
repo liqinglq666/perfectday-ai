@@ -40,6 +40,9 @@ const ok = (intent = valid) => ({ ok: true, status: 200, json: async () => ({ ch
 async function run() {
   assert.equal(await interpretWithBailian(base), base);
   assert.equal(calls.length, 0, 'missing key must never call network');
+  fakeEnv.DASHSCOPE_API_KEY = '误粘贴的示例文字';
+  assert.equal((await interpretWithBailian(base)).intentSource, 'fallback');
+  assert.equal(calls.length, 0, 'malformed key must not reach fetch');
   fakeEnv.DASHSCOPE_API_KEY = 'unit-test-key-never-a-real-secret';
   assert.equal((await interpretWithBailian({ ...base, request: '' })).intentSource, undefined);
   assert.equal(calls.length, 0, 'blank request must not incur a call');

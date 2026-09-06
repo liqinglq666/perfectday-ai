@@ -58,6 +58,10 @@ export async function interpretWithBailian(input: PlanInput): Promise<PlanInput>
   if (!apiKey || !input.request.trim()) return input;
 
   const fallback: PlanInput = { ...input, intentSource: "fallback" };
+  if (!/^[\x21-\x7e]+$/.test(apiKey)) {
+    console.warn("[bailian] invalid_key_format");
+    return fallback;
+  }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -110,8 +114,13 @@ export async function interpretWithBailian(input: PlanInput): Promise<PlanInput>
     const intent = decodeIntent(JSON.parse(choice.message.content), input);
     if (!intent) console.warn("[bailian] invalid_intent");
     return intent || fallback;
-  } catch {
-    console.warn(controller.signal.aborted ? "[bailian] timeout" : "[bailian] request_failed");
+  } catch (error: unknown) {
+    // Emit only allowlisted categories, never exception messages or request data.
+    const networkCodes = new Set(["ENOTFOUND", "ECONNRESET", "ECONNREFUSED", "ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT", "CERT_HAS_EXPIRED", "ERR_TLS_CERT_ALTNAME_INVALID", "ERR_INVALID_URL", "ERR_INVALID_CHAR"]);
+    const cause = isRecord(error) && isRecord(error.cause) ? error.cause : error;
+    const code = isRecord(cause) && typeof cause.code === "string" && networkCodes.has(cause.code) ? cause.code : null;
+    const kind = controller.signal.aborted ? "timeout" : isRecord(error) && error.name === "SyntaxError" ? "invalid_json" : code ? `network_${code}` : "request_failed";
+    console.warn(`[bailian] ${kind}`);
     return fallback;
   } finally {
     clearTimeout(timer);

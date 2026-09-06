@@ -6,7 +6,7 @@ const sceneCopy: Record<Scene, { title: string; subtitle: string }> = {
   family: { title: "亲子 · 轻松遛娃", subtitle: "让孩子有得玩，大人也不用一直赶路。" },
   parents: { title: "陪爸妈 · 舒适慢逛", subtitle: "少走路、多休息，把节奏放慢一点。" },
   friends: { title: "朋友聚会 · 城市轻松逛", subtitle: "好聊、好吃、好朋友，刚刚好的半日时光。" },
-  solo: { title: "独处 · 给自己半天", subtitle: "书店、咖啡与自由闲逛，一个人也可以很完整。" },
+  solo: { title: "独处 · 给自己半天", subtitle: "按自己的喜好慢慢逛，把时间留给喜欢的地方。" },
   rain: { title: "雨天 · 室内自在逛", subtitle: "尽量走室内路线，不让天气打乱今天。" }
 };
 
@@ -196,6 +196,7 @@ function summarize(items: Place[], copy: { title: string; subtitle: string }): T
 export function createPlan(rawInput: PlanInput): TripPlan {
   const input = applyRequestHints(rawInput);
   let selected = applyResolvedPlaces(templates[input.scene].map(byId), input);
+  if (input.excludedPlaceIds?.includes("connector")) selected = oneMall(selected, input.preferredPlaceIds, input.scene);
   if (input.walking === "low") {
     const preferredMalls = new Set(selected.filter((item) => input.preferredPlaceIds?.includes(item.id)).map((item) => item.mall));
     if (preferredMalls.size <= 1) selected = oneMall(selected, input.preferredPlaceIds, input.scene);
