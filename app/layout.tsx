@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import "./v03.css";
 
 export const metadata: Metadata = {
   title: "PerfectDay AI",
@@ -20,17 +19,17 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
-  themeColor: "#c89538"
+  themeColor: "#244b3d"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
       <body>
-        <main className="app-shell">{children}</main>
+        <a className="skip-link" href="#main-content">跳到主要内容</a>{children}
       </body>
     </html>
   );
 }
+

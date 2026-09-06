@@ -1,97 +1,20 @@
-import Image from "next/image";
 import Link from "next/link";
-import { adjustPlan, createPlan, parseChange, parseInput, queryString } from "@/lib/planner";
-
-function formatMinutes(value: number) {
-  const h = Math.floor(value / 60);
-  const m = value % 60;
-  return h ? `${h}小时${m ? `${m}分` : ""}` : `${m}分钟`;
-}
-
-function amapSearchUrl(keyword: string) {
-  const params = new URLSearchParams({
-    keyword,
-    city: "中山市",
-    view: "map",
-    src: "perfectday-ai",
-    callnative: "1"
-  });
-  return `https://uri.amap.com/search?${params.toString()}`;
-}
-
-const changeLabels = {
-  rain: "已切换为更适合雨天的路线",
-  walk: "已减少不必要步行",
-  budget: "已降低可选消费",
-  queue: "已替换排队餐厅"
-};
-
-const activityLabels: Record<string, string> = {
-  start: "集合",
-  culture: "逛逛",
-  coffee: "咖啡",
-  food: "吃饭",
-  shopping: "逛店",
-  family: "亲子",
-  rest: "休息",
-  connector: "换区",
-  activity: "玩一会"
-};
-
+import Header from "@/app/components/header";
+import Icon from "@/app/components/ui-icon";
+import { Metrics, Timeline } from "@/app/components/trip-ui";
+import { adjustPlan, changeQuery, createPlan, describeChanges, parseChanges, parseInput, queryString } from "@/lib/planner";
 export default async function TripPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const params = await searchParams;
-  const input = parseInput(params);
-  const change = parseChange(params.change);
-  const plan = change ? adjustPlan(input, change) : createPlan(input);
-  const qs = queryString(input);
-
-  return (
-    <div className="page trip-page">
-      <header className="topbar"><Link href="/" aria-label="返回">‹</Link><strong>你的行程</strong><span /></header>
-
-      {change && <div className="applied-banner">✓ {changeLabels[change]}</div>}
-
-      <section className="trip-hero">
-        <p className="planning-status">{input.intentSource === "bailian" ? "已按 AI 理解的偏好规划" : input.intentSource === "fallback" ? "AI 暂时不可用，已使用基础规划" : "基础路线规划"}</p>
-        <h1>{plan.title}</h1>
-        <p>{plan.subtitle}</p>
-        <div className="metrics">
-          <div><small>总时长</small><strong>{formatMinutes(plan.totalMinutes)}</strong></div>
-          <div><small>预计消费</small><strong>¥{plan.totalPrice}</strong></div>
-          <div><small>预计步行</small><strong>{plan.totalWalkMinutes} 分</strong></div>
-        </div>
-      </section>
-
-      <section className="timeline compact-timeline">
-        {plan.stops.map((stop, index) => (
-          <article className="stop-row" key={`${stop.id}-${index}`}>
-            <div className="time-col"><strong>{stop.time}</strong><span>{stop.duration}分</span><i /></div>
-            <div className="stop-card visual-stop-card compact-stop-card">
-              <div className="place-visual">
-                <Image src={stop.visual} alt="" width={96} height={120} sizes="96px" />
-                <span className="visual-number">{String(index + 1).padStart(2, "0")}</span>
-              </div>
-              <div className="stop-content">
-                <div className="place-meta"><span>{stop.mall} · {stop.floor}</span></div>
-                <div className="stop-title"><h2>{stop.name}</h2><strong>{stop.price ? `约 ¥${stop.price}` : "免费"}</strong></div>
-                <div className="stop-facts">
-                  <span>{activityLabels[stop.category] || "逛逛"}</span>
-                  {stop.indoor && <span>室内</span>}
-                  {stop.walkMinutes > 0 && <span>步行 {stop.walkMinutes} 分</span>}
-                </div>
-                <div className="stop-actions">
-                  <a target="_blank" rel="noreferrer" href={amapSearchUrl(stop.searchKeyword || `${stop.name} ${stop.address}`)}>⌖ 高德地图</a>
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </section>
-
-      <div className="sticky-actions">
-        <Link className="primary-button compact" href={`/adjust?${qs}${change ? `&change=${change}` : ""}`}>调整行程</Link>
-        <Link className="secondary-button" href="/">重新规划</Link>
-      </div>
-    </div>
-  );
+  const params = await searchParams, input = parseInput(params), changes = parseChanges(params);
+  const base = createPlan(input), plan = changes.length ? adjustPlan(input, changes) : base;
+  const qs = queryString(input), suffix = changeQuery(changes), editUrl = `/?${qs}`;
+  const status = input.intentSource === "bailian" ? "已按 AI 理解的偏好规划" : input.intentSource === "fallback" ? "AI 暂时不可用，已使用基础规划" : "基础路线规划";
+  return <><Header/><main id="main-content" className="page trip-page"><Link className="back-link" href={editUrl}><Icon name="back" size={17}/>修改偏好</Link>
+    <div className="trip-layout"><aside className="trip-summary"><p className="eyebrow">YOUR PERFECT DAY</p><h1>{plan.title}</h1><p className="summary-copy">{plan.subtitle}</p><span className="planning-status"><Icon name="sparkles" size={15}/>{status}</span><Metrics plan={plan}/>
+      {input.request && <div className="request-quote"><small>你想要的今天</small><p>{input.request}</p></div>}
+      <div className="route-actions"><Link className="primary-button" href={`/adjust?${qs}${suffix}`}><Icon name="sliders"/>调整行程<Icon name="arrow"/></Link><Link className="secondary-button" href={editUrl}>重新规划</Link></div>
+      <p className="estimate-note">时间以 14:00 出发为示例，可按实际出发时间顺延。消费与步行均为估算，购物另计；营业、票价和通行情况请以现场为准。</p>
+    </aside><section className="itinerary" aria-labelledby="itinerary-title"><div className="section-heading"><h2 id="itinerary-title">今天的路线</h2><span className="section-note">{plan.stops.filter(stop => stop.category !== "connector").length} 个停留点 · 顺路慢逛</span></div>
+      {changes.length > 0 && <p className="applied-banner"><Icon name="check" size={18}/>{describeChanges(base, plan)}</p>}
+      <Timeline plan={plan} editUrl={editUrl}/><p className="photo-note">卡片图片为 AI 氛围示意，非商户实拍。</p>
+    </section></div></main></>;
 }

@@ -11,8 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "zh-CN",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#f8f5ef",
-    theme_color: "#c89538",
+    background_color: "#f8f8f4",
+    theme_color: "#244b3d",
     categories: ["lifestyle", "travel"],
     icons: [
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
@@ -34,3 +34,4 @@ export default function manifest(): MetadataRoute.Manifest {
     ]
   };
 }
+

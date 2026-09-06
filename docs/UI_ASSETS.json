@@ -1,0 +1,44 @@
+[
+  {
+    "name": "city-afternoon",
+    "prompt": "Use case: photorealistic-natural.\nAsset type: PerfectDay AI city outing web app homepage banner and shopping / explore another district category image.\nPrimary request: One independent landscape 3:2 image, ideally 1536 x 1024 pixels, depicting an invented modern open-air commercial pedestrian street in southern China. Transparent glass storefronts, leafy trees, a small cafe terrace, tasteful burnt-orange patio umbrellas, and a few distant people viewed from behind. Quiet weekend afternoon.\nStyle/medium: Premium natural lifestyle editorial photography, photorealistic, authentic tactile materials, clean sharp image with low noise. Soft clear daylight, gently warm color grading, forest-green foliage and small orange accents.\nComposition/framing: Wide street-level architectural scene with graceful depth, uncluttered, useful central framing with safe margins for UI crops. No recognizable real mall landmarks. This is an atmospheric category illustration, not a representation of any actual merchant or location.\nConstraints: No text, no legible signage, no watermark, no logos, no brand marks, no close-up faces. No illustration, no 3D render, no excessive HDR, no heavy film grain.",
+    "mode": "built-in image_gen",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "file": "public/images/city-afternoon.webp",
+    "web_dimensions": [
+      1200,
+      800
+    ]
+  },
+  {
+    "name": "coffee-reading",
+    "prompt": "Use case: photorealistic-natural.\nAsset type: PerfectDay AI city outing web app arts / coffee activity category card image.\nPrimary request: One independent landscape 3:2 image, ideally 1536 x 1024 pixels, depicting an invented modern bookstore reading corner beside a large window. An oak table with one ceramic cup of latte and an open book, a modest number of crisp bookshelves and green plants behind it, layered sunlight creating a quiet leisurely literary atmosphere.\nStyle/medium: Premium natural lifestyle editorial photography, photorealistic with genuine oak grain, ceramic texture and paper texture, clear soft daylight, slightly warm coloring, deep forest-green accents and a subtle warm orange accent. Low noise.\nComposition/framing: Inviting eye-level to slightly elevated editorial still life, cup and open book in the central safe crop area, enough environmental context to recognize the bookstore, balanced margins for UI cropping. This is an atmospheric category illustration, not a representation of any actual merchant or location.\nConstraints: No legible text on pages or book spines, no signage, no watermark, no logos, no brand marks. No illustration, no 3D render, no excessive HDR, no heavy film grain.",
+    "mode": "built-in image_gen",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "file": "public/images/coffee-reading.webp",
+    "web_dimensions": [
+      1200,
+      800
+    ]
+  },
+  {
+    "name": "play-together",
+    "prompt": "Use case: photorealistic-natural.\nAsset type: PerfectDay AI city outing web app family / friends activities category card image.\nPrimary request: One independent landscape 3:2 image, ideally 1536 x 1024 pixels, depicting an invented modern indoor bowling and interactive sports space. A burnt-orange bowling ball resting on a bowling ball rack in the foreground, forest-green upholstered seats nearby, clean bowling lanes receding into the background, and only a few distant friends seen from behind.\nStyle/medium: Premium natural lifestyle editorial photography, photorealistic with authentic polished wood, bowling ball sheen and fabric textures, bright natural daylight, softly warm color grading, deep forest-green and burnt-orange palette accents, low noise.\nComposition/framing: Balanced wide interior scene suitable for UI cropping; the orange ball is the primary foreground detail, clean lanes remain recognizable in the background. Friendly and relaxed with quiet visual organization. This is an atmospheric category illustration, not a representation of any actual merchant or location.\nConstraints: No readable text, no scoring-screen numbers, no signage, no watermark, no logos, no brand marks, no close-up faces. Avoid nightclub neon, dark neon arcade mood, excessively childish amusement park styling, illustration, 3D render, excessive HDR, heavy film grain.",
+    "mode": "built-in image_gen",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "file": "public/images/play-together.webp",
+    "web_dimensions": [
+      1200,
+      800
+    ]
+  }
+]

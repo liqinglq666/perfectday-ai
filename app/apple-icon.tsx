@@ -14,16 +14,17 @@ export default function AppleIcon() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(145deg,#fffaf0,#ead8b9)",
-          color: "#171717",
+          background: "#244b3d",
+          color: "#f8f8f4",
           borderRadius: 36
         }}
       >
-        <div style={{ width: 58, height: 58, borderRadius: 999, background: "#c89538", marginBottom: 12 }} />
-        <div style={{ width: 104, height: 12, borderRadius: 999, background: "#171717" }} />
-        <div style={{ width: 72, height: 8, borderRadius: 999, background: "#c89538", marginTop: 10 }} />
+        <div style={{ width: 58, height: 58, borderRadius: 999, background: "#f8f8f4", marginBottom: 12 }} />
+        <div style={{ width: 104, height: 12, borderRadius: 999, background: "#f8f8f4" }} />
+        <div style={{ width: 72, height: 8, borderRadius: 999, background: "#f8f8f4", marginTop: 10 }} />
       </div>
     ),
     size
   );
 }
+

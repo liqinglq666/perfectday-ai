@@ -47,42 +47,6 @@ function toClock(totalMinutes: number) {
   return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }
 
-function fitBudget(items: Place[], cap: number) {
-  const result = [...items];
-  const total = () => result.reduce((sum, item) => sum + item.price, 0);
-
-  while (total() > cap && result.length > 3) {
-    let candidateIndex = -1;
-    let candidatePrice = -1;
-
-    result.forEach((item, index) => {
-      if (item.price > candidatePrice && item.category !== "start" && item.category !== "connector" && item.category !== "family") {
-        candidateIndex = index;
-        candidatePrice = item.price;
-      }
-    });
-
-    if (candidateIndex < 0) break;
-    result.splice(candidateIndex, 1);
-  }
-
-  return result;
-}
-
-function fitDuration(items: Place[], duration: number) {
-  let elapsed = 0;
-  const result: Place[] = [];
-
-  for (const item of items) {
-    const next = elapsed + item.duration + item.walkMinutes;
-    if (next > duration && result.length >= 3) break;
-    result.push(item);
-    elapsed = next;
-  }
-
-  return result;
-}
-
 function inferScene(text: string, fallback: Scene): Scene {
   if (/下雨|雨天|只想室内|室内为主/.test(text)) return "rain";
   if (/孩子|小朋友|宝宝|亲子|遛娃/.test(text)) return "family";
@@ -94,10 +58,10 @@ function inferScene(text: string, fallback: Scene): Scene {
 }
 
 function inferDuration(text: string, fallback: number) {
-  const match = text.match(/(\d(?:\.\d)?)\s*(?:个)?小时/);
-  if (!match) return fallback;
-  const hours = Number(match[1]);
-  return Number.isFinite(hours) ? Math.max(90, Math.min(480, Math.round(hours * 60))) : fallback;
+  const normalized = text.replace(/[一二两三四五六七八]/g, (digit) => String("一二三四五六七八".indexOf(digit === "两" ? "二" : digit) + 1));
+  const match = normalized.match(/(\d+(?:\.\d+)?)\s*(?:个)?(半)?小时/);
+  const hours = match ? Number(match[1]) + (match[2] || /小时半/.test(normalized) ? 0.5 : 0) : /半天/.test(text) ? 4 : null;
+  return hours === null ? fallback : Math.max(90, Math.min(480, Math.round(hours * 60)));
 }
 
 function inferBudget(text: string, fallback: Budget): Budget {
@@ -119,13 +83,37 @@ function applyRequestHints(input: PlanInput): PlanInput {
   if (input.intentSource === "bailian") return input;
   const text = input.request.trim();
   if (!text) return input;
-
+  const mentions: [string, string[]][] = [
+    ["书店|阅读|文创", ["boya-bookstore"]],
+    ["咖啡", ["daka-coffee"]],
+    ["瑞幸", ["luckin-coffee"]],
+    ["星巴克", ["golden-coffee"]],
+    ["运动|台球|保龄|射箭|游戏|主机|VR|互动|潮玩馆", ["dayu-player"]],
+    ["泡泡玛特|盲盒", ["popmart"]],
+    ["宜得利|家居|家装|生活方式店", ["nitori"]],
+    ["盒马|超市|生鲜|买菜|伴手礼", ["hema"]],
+    ["吃饭|晚餐|晚饭|酸菜鱼|太二", ["golden-food"]]
+  ];
+  const excluded = new Set(input.excludedPlaceIds || []);
+  const preferred = new Set(input.preferredPlaceIds || []);
+  const negative = (pattern: string) => new RegExp(`(?:不(?:想|要|用|去|喝|吃|逛|玩)*|别|避开)[^，。；！？,;!?\\n]{0,6}(?:${pattern})`, "i").test(text);
+  for (const [pattern, ids] of mentions) {
+    if (negative(pattern)) ids.forEach((id) => excluded.add(id));
+    else if (new RegExp(pattern, "i").test(text)) ids.forEach((id) => preferred.add(id));
+  }
+  for (const [pattern, category] of [["咖啡", "coffee"], ["吃饭|晚餐|晚饭|餐厅", "food"], ["购物|逛店", "shopping"]]) {
+    if (negative(pattern)) places.filter((place) => place.category === category).forEach((place) => excluded.add(place.id));
+  }
+  if (preferred.has("luckin-coffee") || preferred.has("golden-coffee")) preferred.delete("daka-coffee");
   return {
     ...input,
     scene: inferScene(text, input.scene),
     duration: inferDuration(text, input.duration),
     budget: inferBudget(text, input.budget),
-    walking: inferWalking(text, input.walking)
+    walking: inferWalking(text, input.walking),
+    preferredPlaceIds: [...preferred].filter((id) => !excluded.has(id)),
+    excludedPlaceIds: [...excluded],
+    indoorOnly: input.indoorOnly || /只想室内|尽量.*室内|室内为主|不去室外/.test(text)
   };
 }
 
@@ -135,32 +123,6 @@ function insertBeforeFood(items: Place[], place: Place) {
   const next = [...items];
   next.splice(foodIndex >= 0 ? foodIndex : next.length, 0, place);
   return next;
-}
-
-function applyPlaceHints(items: Place[], request: string) {
-  const text = request.trim();
-  if (!text) return items;
-
-  let result = [...items];
-
-  if (/运动|台球|保龄|射箭|游戏|主机|VR|互动|潮玩馆/.test(text)) {
-    const activity = byId("dayu-player");
-    const cultureIndex = result.findIndex((item) => item.category === "culture");
-    if (cultureIndex >= 0) result[cultureIndex] = activity;
-    else result = insertBeforeFood(result, activity);
-  }
-
-  if (/瑞幸|便宜点的咖啡|性价比咖啡|咖啡便宜/.test(text)) {
-    result = result.map((item) => item.category === "coffee" ? byId("luckin-coffee") : item);
-  } else if (/星巴克/.test(text)) {
-    result = result.map((item) => item.category === "coffee" ? byId("golden-coffee") : item);
-  }
-
-  if (/泡泡玛特|盲盒|潮玩/.test(text)) result = insertBeforeFood(result, byId("popmart"));
-  if (/宜得利|家居|家装|生活方式店/.test(text)) result = insertBeforeFood(result, byId("nitori"));
-  if (/盒马|超市|生鲜|买菜|伴手礼/.test(text)) result = insertBeforeFood(result, byId("hema"));
-
-  return result.filter((item, index, array) => array.findIndex((candidate) => candidate.id === item.id) === index);
 }
 
 function applyResolvedPlaces(items: Place[], input: PlanInput) {
@@ -185,47 +147,45 @@ function orderByMall(items: Place[]) {
   return [...holiday, ...(holiday.length && golden.length ? [connector || byId("connector")] : []), ...golden];
 }
 
-export function createPlan(rawInput: PlanInput): TripPlan {
-  const input = applyRequestHints(rawInput);
-  const copy = sceneCopy[input.scene];
-  let selected = templates[input.scene].map(byId);
-  selected = input.intentSource === "bailian"
-    ? applyResolvedPlaces(selected, input)
-    : applyPlaceHints(selected, input.request);
-
-  if (input.walking === "low") {
-    selected = selected.map((item) => item.id === "connector"
-      ? { ...item, duration: 10, walkMinutes: 5, note: "优先走已打通的连通区域，减少绕行和无效步行。" }
-      : item);
+function withinLimits(items: Place[], input: PlanInput) {
+  let result = orderByMall(items);
+  const preferred = new Set(input.preferredPlaceIds || []);
+  while (result.length && (result.reduce((sum, item) => sum + item.price, 0) > budgetCap[input.budget] ||
+    result.reduce((sum, item) => sum + item.duration + item.walkMinutes, 0) > input.duration)) {
+    const candidates = result.map((item, index) => ({ item, index }))
+      .filter(({ item }) => item.category !== "connector")
+      .sort((a, b) => {
+        const priority = (item: Place) => preferred.has(item.id) ? 100 : item.category === "start" ? -1 :
+          item.category === "family" && input.scene === "family" ? 20 :
+          item.category === "rest" && input.scene === "parents" ? 10 : 0;
+        return priority(a.item) - priority(b.item) || b.index - a.index;
+      });
+    if (!candidates.length) return [];
+    result.splice(candidates[0].index, 1);
+    result = orderByMall(result);
   }
+  return result;
+}
 
-  // Model preferences are accepted only as known IDs; all place facts stay local.
-  if (input.intentSource === "bailian") {
-    selected = orderByMall(selected);
-    // The original rule planner keeps at least three stops. An AI route must also
-    // fit the user's limits when a preferred activity is long or expensive.
-    while (selected.length && (selected.reduce((sum, item) => sum + item.price, 0) > budgetCap[input.budget] ||
-        selected.reduce((sum, item) => sum + item.duration + item.walkMinutes, 0) > input.duration)) {
-      const optional = selected.findLastIndex((item) => item.category !== "connector" &&
-        !input.preferredPlaceIds?.includes(item.id));
-      selected.splice(optional >= 0 ? optional : selected.length - 1, 1);
-      selected = orderByMall(selected);
-    }
-  } else {
-    selected = fitBudget(selected, budgetCap[input.budget]);
-    selected = fitDuration(selected, input.duration);
-  }
+// Fewer mall changes reduce walking without inventing shorter travel times.
+function oneMall<T extends Place>(items: T[], preferred: string[] = [], scene?: Scene): T[] {
+  const groups = [items.filter((item) => item.mall === "假日广场"),
+    items.filter((item) => item.mall !== "假日广场" && item.category !== "connector")];
+  const score = (group: T[]) => group.reduce((sum, item) => sum +
+    (preferred.includes(item.id) ? 100 : item.category === "family" && scene === "family" ? 20 : 1), 0);
+  return groups.sort((a, b) => score(b) - score(a))[0];
+}
 
+function summarize(items: Place[], copy: { title: string; subtitle: string }): TripPlan {
   let elapsed = 0;
-  const stops: TripStop[] = selected.map((item) => {
+  const stops: TripStop[] = orderByMall(items).map((item) => {
     const stop = { ...item, time: toClock(elapsed) };
     elapsed += item.duration + item.walkMinutes;
     return stop;
   });
-
   return {
-    title: copy.title,
-    subtitle: selected.length ? copy.subtitle : "当前地点库没有符合这些条件的安排，请放宽条件后重新规划。",
+    ...copy,
+    subtitle: stops.length ? copy.subtitle : "当前地点库没有符合这些条件的安排，请放宽条件后重新规划。",
     stops,
     totalMinutes: elapsed,
     totalPrice: stops.reduce((sum, item) => sum + item.price, 0),
@@ -233,66 +193,59 @@ export function createPlan(rawInput: PlanInput): TripPlan {
   };
 }
 
-export function adjustPlan(input: PlanInput, change: AdjustmentChange): TripPlan {
+export function createPlan(rawInput: PlanInput): TripPlan {
+  const input = applyRequestHints(rawInput);
+  let selected = applyResolvedPlaces(templates[input.scene].map(byId), input);
+  if (input.walking === "low") {
+    const preferredMalls = new Set(selected.filter((item) => input.preferredPlaceIds?.includes(item.id)).map((item) => item.mall));
+    if (preferredMalls.size <= 1) selected = oneMall(selected, input.preferredPlaceIds, input.scene);
+  }
+  return summarize(withinLimits(selected, input), sceneCopy[input.scene]);
+}
+
+export function adjustPlan(rawInput: PlanInput, change: AdjustmentChange | AdjustmentChange[]): TripPlan {
+  const input = applyRequestHints(rawInput);
   const base = createPlan(input);
+  const changes = new Set(Array.isArray(change) ? change : [change]);
   let stops: TripStop[] = base.stops.map((stop) => ({ ...stop, status: "kept" }));
-
-  if (change === "rain") {
-    stops = stops
-      .filter((stop) => stop.indoor || stop.category === "connector")
-      .map<TripStop>((stop) => ({
-        ...stop,
-        status: stop.category === "connector" ? "shortened" : "kept"
-      }));
+  if (changes.has("rain")) stops = stops.filter((stop) => stop.indoor);
+  if (changes.has("walk")) stops = oneMall(stops, input.preferredPlaceIds, input.scene);
+  if (changes.has("queue")) {
+    stops = stops.map((stop) => stop.category === "food" ? {
+      ...stop,
+      name: "石岐万象汇 · 餐饮区现场备选",
+      searchKeyword: "中山石岐万象汇 餐饮",
+      price: Math.min(stop.price, 90),
+      status: "replaced" as const,
+      note: "在餐饮区现场比较排队情况，自选等待较短的门店；这里不代表实时推荐。",
+      sourceLabel: "商圈公共区域",
+      sourceUrl: "https://www.zsnews.cn/trade/index/view/cateid/45/id/698538.html"
+    } : stop);
   }
-
-  if (change === "walk") {
-    stops = stops.map<TripStop>((stop) => stop.category === "connector"
-      ? { ...stop, duration: 8, walkMinutes: 4, status: "shortened", note: "继续通过连通区域前往下一站，尽量减少绕行。" }
-      : stop);
+  if (changes.has("budget")) {
+    const paid = [...stops].filter((stop) => stop.price > 0)
+      .sort((a, b) => Number(input.preferredPlaceIds?.includes(a.id) || false) - Number(input.preferredPlaceIds?.includes(b.id) || false) || b.price - a.price)[0];
+    if (paid) stops = stops.filter((stop) => stop.id !== paid.id);
   }
+  return summarize(stops, base);
+}
 
-  if (change === "budget") {
-    const paid = stops
-      .map((stop, index) => ({ stop, index }))
-      .filter(({ stop }) => stop.price > 0 && stop.category !== "food" && stop.category !== "family")
-      .sort((a, b) => b.stop.price - a.stop.price)[0];
+export function parseChanges(params: Record<string, string | string[] | undefined>): AdjustmentChange[] {
+  const raw = typeof params.changes === "string" ? params.changes : typeof params.change === "string" ? params.change : "";
+  return [...new Set(raw.slice(0, 100).split(",").map(parseChange).filter((value): value is AdjustmentChange => value !== null))];
+}
 
-    if (paid) stops = stops.filter((_, index) => index !== paid.index);
-  }
+export function changeQuery(changes: AdjustmentChange[]) {
+  return changes.length ? `&changes=${changes.join(",")}` : "";
+}
 
-  if (change === "queue") {
-    stops = stops.map<TripStop>((stop) => stop.category === "food"
-      ? {
-          ...stop,
-          name: "石岐万象汇 · 餐饮区现场备选",
-          floor: "餐饮楼层",
-          address: "中山市石岐区孙文东路28号中山石岐万象汇",
-          searchKeyword: "中山石岐万象汇 餐饮",
-          price: 90,
-          status: "replaced",
-          verified: true,
-          sourceLabel: "商圈公共区域",
-          sourceUrl: "https://www.zsnews.cn/trade/index/view/cateid/45/id/698538.html",
-          note: "当前餐厅排队过久时，优先到商场餐饮区现场选择等待更短的门店。"
-        }
-      : stop);
-  }
-
-  let elapsed = 0;
-  stops = stops.map<TripStop>((stop) => {
-    const next = { ...stop, time: toClock(elapsed) };
-    elapsed += stop.duration + stop.walkMinutes;
-    return next;
-  });
-
-  return {
-    ...base,
-    stops,
-    totalMinutes: elapsed,
-    totalPrice: stops.reduce((sum, stop) => sum + stop.price, 0),
-    totalWalkMinutes: stops.reduce((sum, stop) => sum + stop.walkMinutes, 0)
-  };
+export function describeChanges(base: TripPlan, plan: TripPlan) {
+  const removed = base.stops.filter((stop) => stop.category !== "connector" && !plan.stops.some((item) => item.id === stop.id)).length;
+  const savings = base.totalPrice - plan.totalPrice;
+  const walking = base.totalWalkMinutes - plan.totalWalkMinutes;
+  const details = [removed ? `减少 ${removed} 个停留点` : "", savings > 0 ? `预计节省 ¥${savings}` : "", walking > 0 ? `少走约 ${walking} 分钟` : "",
+    plan.stops.some((stop) => stop.status === "replaced") ? "餐厅改为现场备选" : ""].filter(Boolean);
+  return details.length ? details.join(" · ") : "当前路线已符合这些条件，无需额外调整。";
 }
 
 export function parseInput(params: Record<string, string | string[] | undefined>, inferRequest = true): PlanInput {

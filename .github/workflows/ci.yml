@@ -24,8 +24,12 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Regression tests
+        run: npm test
+
       - name: Typecheck
         run: npm run typecheck
 
       - name: Production build
         run: npm run build
+
