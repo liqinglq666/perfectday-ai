@@ -1,4 +1,5 @@
 import { places } from "@/data/places";
+import { applyClosedPlaceHints } from "@/lib/closed-places";
 import type { AdjustmentChange, Budget, PlanInput, Place, Scene, TripPlan, TripStop } from "@/types";
 
 const sceneCopy: Record<Scene, { title: string; subtitle: string }> = {
@@ -225,7 +226,7 @@ function summarize(items: Place[], copy: { title: string; subtitle: string }): T
 }
 
 export function createPlan(rawInput: PlanInput): TripPlan {
-  const input = applyRequestHints(rawInput);
+  const input = applyRequestHints(applyClosedPlaceHints(rawInput));
   let selected = applyResolvedPlaces(templates[input.scene].map(byId), input);
   // Public reports confirm connection, but do not establish a fully sheltered path.
   if (input.indoorOnly || input.scene === "rain") selected = oneMallWithAlternatives(selected, input);
@@ -238,7 +239,7 @@ export function createPlan(rawInput: PlanInput): TripPlan {
 }
 
 export function adjustPlan(rawInput: PlanInput, change: AdjustmentChange | AdjustmentChange[]): TripPlan {
-  const input = applyRequestHints(rawInput);
+  const input = applyRequestHints(applyClosedPlaceHints(rawInput));
   const base = createPlan(input);
   const changes = new Set(Array.isArray(change) ? change : [change]);
   let stops: TripStop[] = base.stops.map((stop) => ({ ...stop, status: "kept" }));
@@ -308,7 +309,8 @@ export function parseInput(params: Record<string, string | string[] | undefined>
       indoorOnly: value("indoor", "0") === "1"
     } : source === "fallback" ? { intentSource: "fallback" as const } : {})
   };
-  return inferRequest ? applyRequestHints(input) : input;
+  const parsed = inferRequest ? applyRequestHints(input) : input;
+  return applyClosedPlaceHints(parsed);
 }
 
 export function parseChange(value: string | string[] | undefined): AdjustmentChange | null {
