@@ -277,24 +277,24 @@ export const places: Place[] = [
     id: "golden-food",
     name: "太二酸菜鱼（中山石岐万象汇店）",
     mall: "完美金鹰 · 石岐万象汇",
-    floor: "商场餐饮楼层",
-    address: "中山市石岐区孙文东路28号中山石岐万象汇",
+    floor: "L4 · L418",
+    address: "广东省中山市石岐区孙文东路28号中山石岐万象汇L418商铺",
     category: "food",
     tags: ["date", "family", "parents", "friends", "rain"],
     duration: 65,
     price: 120,
     indoor: true,
     walkMinutes: 4,
-    note: "2026商圈资料仍列有该品牌；金额为人均路线预算估算，实际以门店为准。",
+    note: "太二官方门店页当前列有中山石岐万象汇店；金额为人均路线预算估算，实际消费以门店为准。",
     icon: "♨",
     accent: "orange",
     visual: "/visuals/dining.svg",
     verified: true,
     checkedAt: "2026-09-07",
     searchKeyword: "太二酸菜鱼 中山石岐万象汇",
-    sourceLabel: "香港01 · 2026-05-23",
-    evidenceNote: "报道列出品牌，未给出确切铺位；出发前查看商场导视。",
-    sourceUrl: "https://global.hk01.com/%E6%97%85%E6%B8%B8/60335969/%E4%B8%AD%E5%B1%B1%E5%95%86%E5%9C%BA7%E5%A4%A7-%E4%B8%87%E8%B1%A1%E6%B1%87-%E6%B1%87%E4%B8%B0%E5%9F%8E-coco-city-1%E5%95%86%E5%9C%BA%E8%A2%AB%E8%AA%89%E4%B8%BA%E5%B9%B3%E6%B0%91%E7%89%88k11"
+    sourceLabel: "太二官方门店页",
+    evidenceNote: "官方门店列表明确地址为L418商铺；营业、排队与实际人均消费仍以门店现场为准。",
+    sourceUrl: "https://www.taier.net/Store/"
   },
   {
     id: "golden-rest",
@@ -319,4 +319,3 @@ export const places: Place[] = [
     sourceUrl: "https://www.zsnews.cn/trade/index/view/cateid/45/id/698538.html"
   }
 ];
-
