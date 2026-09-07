@@ -1,7 +1,7 @@
 import "server-only";
 
 import { places } from "@/data/places";
-import { isBudget, isScene, isWalking } from "@/lib/planner";
+import { isBudget, isScene, isWalking } from "@/lib/plan-config";
 import type { PlanInput } from "@/types";
 
 const DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1";
