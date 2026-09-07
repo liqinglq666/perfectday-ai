@@ -20,6 +20,7 @@ const caps = { "100": 100, "300": 300, "500": 500, plus: 800 };
 const catalog = new Map(places.map(place => [place.id, place]));
 export const mallName = (mall: Mall | "") => mall === "holiday" ? "假日广场" : mall === "golden" ? "石岐万象汇" : "尚未开始";
 const mallOf = (place: Place): Mall => place.mall === "假日广场" ? "holiday" : "golden";
+const replaceableCategories = new Set<Place["category"]>(["coffee", "food", "shopping"]);
 export function clockText(minutes: number) {
   const value = ((minutes % 1440) + 1440) % 1440;
   return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
@@ -27,7 +28,23 @@ export function clockText(minutes: number) {
 const refOf = (stop: Place & { status?: string }): StopRef => ({ id: stop.id, ...(stop.status === "replaced" ? { q: 1 as const } : {}) });
 export function resolveStop(ref: StopRef): Place & { status?: "replaced" } {
   const place = catalog.get(ref.id)!;
-  return ref.q && place.category === "food" ? { ...place, name: "石岐万象汇 · 餐饮区现场备选", floor: "餐饮区域 · 现场自选", searchKeyword: "中山石岐万象汇 餐饮", price: 90, status: "replaced", note: "请现场比较菜单和等待情况，预留人均90元用餐预算。未接入实时排队，不保证有空位。", sourceLabel: "商圈公共区域", sourceUrl: "https://www.zsnews.cn/trade/index/view/cateid/45/id/698538.html", evidenceNote: "这是现场自选安排，不是一家已核定的替代餐厅。" } : { ...place };
+  if (!ref.q || place.category !== "food") return { ...place };
+  const mall = mallOf(place), label = mallName(mall);
+  return {
+    ...place,
+    name: `${label} · 餐饮区现场备选`,
+    floor: "餐饮区域 · 现场自选",
+    address: mall === "holiday" ? "中山市石岐街道兴中道6号假日广场" : "中山市石岐区孙文东路28号中山石岐万象汇",
+    searchKeyword: `${label} 餐饮`,
+    price: Math.min(place.price, 90),
+    status: "replaced",
+    note: "请在当前商场餐饮区现场比较菜单和等待情况；未接入实时排队，不保证有空位。",
+    sourceLabel: "商场公共区域",
+    sourceUrl: undefined,
+    evidenceNote: "这是当前商场内的现场自选安排，不是一家已核定的替代餐厅。",
+    evidenceStatus: "public_area",
+    locationPrecision: "area"
+  };
 }
 export function startJourney(input: PlanInput, changes: AdjustmentChange[] = []): Journey {
   const plan = changes.length ? adjustPlan(input, changes) : createPlan(input);
@@ -80,6 +97,40 @@ function onward(items: StopRef[], current: Journey["current"], crossed: boolean)
   if (crossed) return near;
   return [...near, ...(far.length && (current || near.length) ? [{ id: "connector" }] : []), ...far];
 }
+
+function bestSameMallAlternative(source: Place, chosen: Mall, input: PlanInput, unavailable: Set<string>) {
+  if (!replaceableCategories.has(source.category)) return null;
+  const needsIndoor = input.indoorOnly || input.scene === "rain";
+  const evidenceRank = { online_listing: 2, published_reference: 1, public_area: 0 } as const;
+  const precisionRank = { exact: 2, mall: 1, area: 0 } as const;
+  return places.filter(place => mallOf(place) === chosen && place.category === source.category &&
+      !unavailable.has(place.id) && !input.excludedPlaceIds?.includes(place.id) &&
+      (!needsIndoor || place.indoor) && place.tags.includes(input.scene))
+    .sort((a, b) => Number(input.preferredPlaceIds?.includes(b.id) || false) - Number(input.preferredPlaceIds?.includes(a.id) || false) ||
+      evidenceRank[b.evidenceStatus] - evidenceRank[a.evidenceStatus] || precisionRank[b.locationPrecision] - precisionRank[a.locationPrecision] ||
+      a.walkMinutes - b.walkMinutes || a.price - b.price)[0] || null;
+}
+
+/** Replace portable far-away categories with reviewed candidates in the chosen mall before deleting them. */
+function replaceWithSameMall(items: StopRef[], chosen: Mall, input: PlanInput, journey: Journey, removed: Map<string, string>) {
+  const unavailable = new Set<string>([
+    ...journey.done.map(ref => ref.id), ...journey.skipped, ...(input.excludedPlaceIds || [])
+  ]);
+  const localCategories = new Set(items.filter(ref => ref.id !== "connector" && mallOf(resolveStop(ref)) === chosen)
+    .map(ref => resolveStop(ref).category));
+  return items.map(ref => {
+    if (ref.id === "connector") return ref;
+    const source = resolveStop(ref);
+    if (mallOf(source) === chosen || localCategories.has(source.category)) return ref;
+    const alternative = bestSameMallAlternative(source, chosen, input, unavailable);
+    if (!alternative) return ref;
+    unavailable.add(alternative.id);
+    localCategories.add(alternative.category);
+    removed.set(ref.id, `改为${mallName(chosen)}同类候选：${alternative.name}`);
+    return { id: alternative.id };
+  });
+}
+
 export function replanRemaining(input: PlanInput, journey: Journey, changes: AdjustmentChange[] = []) {
   const flags = new Set(changes), removed = new Map<string, string>();
   const crossed = journey.done.some(ref => ref.id === "connector") || journey.skipped.includes("connector");
@@ -91,6 +142,7 @@ export function replanRemaining(input: PlanInput, journey: Journey, changes: Adj
   if (flags.has("walk") || flags.has("rain") || input.indoorOnly || input.scene === "rain") {
     const score = (mall: Mall) => items.reduce((sum, ref) => sum + (mallOf(resolveStop(ref)) === mall ? input.preferredPlaceIds?.includes(ref.id) ? 100 : input.scene === "family" && resolveStop(ref).category === "family" ? 20 : 1 : 0), 0);
     const chosen = journey.current || (score("holiday") >= score("golden") ? "holiday" : "golden");
+    items = replaceWithSameMall(items, chosen, input, journey, removed);
     removeWhere(ref => ref.id === "connector" || mallOf(resolveStop(ref)) !== chosen, `集中在${mallName(chosen)}，减少换区`);
   }
   if (flags.has("queue")) items = items.map(ref => resolveStop(ref).category === "food" ? { id: ref.id, q: 1 } : ref);
