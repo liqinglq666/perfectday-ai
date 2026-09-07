@@ -160,7 +160,7 @@ test('walking adjustment can replace far shopping with the reviewed Holiday Plaz
 });
 test('same-mall replacement never resurrects a completed stop and queue fallback names the current mall', () => {
   const done = [{ id: 'daka-coffee', t: 840, d: 45, p: 32, w: 4 }];
-  const state = stateWith(['connector', 'golden-coffee', 'golden-food'], { current: 'holiday', done, minutes: 180, cash: 200 });
+  const state = stateWith(['connector', 'luckin-coffee', 'golden-food'], { current: 'holiday', done, minutes: 180, cash: 200 });
   const result = j.replanRemaining(base, state, ['walk', 'queue']);
   assert(!result.journey.pending.some(stop => stop.id === 'daka-coffee'));
   assert(result.journey.pending.some(stop => stop.id === 'holiday-dessert'));
