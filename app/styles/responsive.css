@@ -2,7 +2,6 @@
   .primary-button:hover { background: var(--green-dark); }
   .secondary-button:hover { background: #f0f5e9; border-color: #91aa7e; }
   .text-link:hover, .back-link:hover, .map-link:hover { color: #173e23; text-decoration: underline; text-underline-offset: 4px; }
-  .inspiration-card:hover { transform: translateY(-3px); }
   .map-cta:hover { background: #fff9e9; }
   .complete-cta:hover { background: #ffffff17; }
   .guide-nav a:hover { background: #e9f0e2; }
@@ -70,19 +69,8 @@
   .recent-trip p { font-size: 11px; }
   .recent-symbol { width: 37px; height: 39px; }
   .recent-trip a { width: 100%; min-height: 44px; font-size: 12px; margin-top: 2px; }
-  .inspiration-section { margin-top: 37px; }
   .section-heading { gap: 12px; align-items: flex-start; }
   .section-heading h2 { font-size: 21px; }
-  .inspiration-section .section-note { display: none; }
-  .inspiration-grid { grid-template-columns: 1fr; gap: 13px; }
-  .inspiration-card { display: grid; grid-template-columns: 105px minmax(0,1fr); border-radius: 14px; }
-  .inspiration-image { height: 100%; min-height: 129px; }
-  .inspiration-image>span { display: none; }
-  .inspiration-content { padding: 17px 15px; align-self: center; }
-  .inspiration-content small { font-size: 9px; }
-  .inspiration-content h3 { font-size: 15px; margin: 6px 0; padding: 0; }
-  .inspiration-content p { font-size: 11px; line-height: 1.8; padding: 0; }
-  .card-arrow { display: none; }
   .home-guide-link { padding: 22px; display: block; margin: 24px 0 18px; }
   .home-guide-link strong { font-size: 16px; }
   .home-guide-link p { font-size: 12px; line-height: 1.8; }
