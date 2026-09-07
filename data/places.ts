@@ -1,4 +1,5 @@
 import type { Place } from "@/types";
+import { holidayCandidates } from "@/data/holiday-candidates";
 
 export const places: Place[] = [
   {
@@ -331,5 +332,6 @@ export const places: Place[] = [
     searchKeyword: "中山石岐万象汇",
     sourceLabel: "商圈公开资料",
     sourceUrl: "https://www.zsnews.cn/trade/index/view/cateid/45/id/698538.html"
-  }
+  },
+  ...holidayCandidates
 ];
