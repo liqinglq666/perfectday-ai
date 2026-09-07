@@ -1,0 +1,80 @@
+import type { Place } from "@/types";
+
+/**
+ * Extra Holiday Plaza candidates reviewed from public online sources on 2026-09-07.
+ * These are online references, not field verification or real-time operating guarantees.
+ */
+export const holidayCandidates: Place[] = [
+  {
+    id: "holiday-uniqlo",
+    name: "UNIQLO 优衣库（中山假日广场店）",
+    mall: "假日广场",
+    floor: "1F",
+    address: "中山市石岐区兴中道6号假日广场1F",
+    category: "shopping",
+    tags: ["date", "family", "parents", "friends", "solo", "rain"],
+    duration: 35,
+    price: 0,
+    indoor: true,
+    walkMinutes: 3,
+    note: "适合作为轻购物候选；路线默认不把购物金额计入预算，营业时间以品牌或商场现场为准。",
+    icon: "□",
+    accent: "rose",
+    visual: "/visuals/shopping.svg",
+    evidenceStatus: "online_listing",
+    locationPrecision: "exact",
+    checkedAt: "2026-09-07",
+    searchKeyword: "优衣库 中山假日广场店",
+    sourceLabel: "UNIQLO 官方门店页",
+    evidenceNote: "品牌官方门店页当前列出中山市石岐区兴中道6号假日广场1F；营业时间可能调整。",
+    sourceUrl: "https://www.uniqlo.com/cn/shop/shop366.html"
+  },
+  {
+    id: "holiday-cafe-de-coral",
+    name: "大家乐（中山假日广场店）",
+    mall: "假日广场",
+    floor: "2F · A10",
+    address: "中山市石岐街道兴中道6号假日广场二楼A10商铺",
+    category: "food",
+    tags: ["family", "parents", "friends", "solo", "rain"],
+    duration: 50,
+    price: 45,
+    indoor: true,
+    walkMinutes: 4,
+    note: "适合作为不跨商场时的简餐候选；人均45元仅为路线预算估算，实际菜单与营业状态以门店为准。",
+    icon: "♨",
+    accent: "orange",
+    visual: "/visuals/dining.svg",
+    evidenceStatus: "online_listing",
+    locationPrecision: "exact",
+    checkedAt: "2026-09-07",
+    searchKeyword: "大家乐 中山假日广场店",
+    sourceLabel: "Trip.com 门店页",
+    evidenceNote: "平台当前页面列出假日广场二楼A10商铺并展示营业信息；不等于本项目实时核验。",
+    sourceUrl: "https://www.trip.com/restaurant/china/zhongshan/detail/restaurant-171259/"
+  },
+  {
+    id: "holiday-dessert",
+    name: "珠珑入水·手作糖水（假日广场店）",
+    mall: "假日广场",
+    floor: "1F · G层C111-1",
+    address: "中山市石岐区兴中道6号假日广场一楼G层C111-1号",
+    category: "coffee",
+    tags: ["date", "family", "parents", "friends", "solo", "rain"],
+    duration: 35,
+    price: 30,
+    indoor: true,
+    walkMinutes: 3,
+    note: "适合作为糖水、甜品和中途休息候选；人均30元仅为路线预算估算，实际菜单与营业状态以门店为准。",
+    icon: "◌",
+    accent: "coffee",
+    visual: "/visuals/coffee.svg",
+    evidenceStatus: "online_listing",
+    locationPrecision: "exact",
+    checkedAt: "2026-09-07",
+    searchKeyword: "珠珑入水 手作糖水 假日广场 中山",
+    sourceLabel: "Trip.com 门店页",
+    evidenceNote: "平台当前页面列出一楼G层C111-1号，并有2026年近期用户记录；仍不构成实时营业保证。",
+    sourceUrl: "https://hk.trip.com/restaurant/china/zhongshan/detail/restaurant-130240822/"
+  }
+];
