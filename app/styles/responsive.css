@@ -11,7 +11,7 @@
   .planning-layout { gap: 28px; }
   .planner-panel { padding: 24px 21px; }
   .home-intro h1 { font-size: 52px; }
-  .scene-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .scene-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .scene-option>span { min-height: 47px; flex-direction: row; }
   .location { display: none; }
   .trip-layout { grid-template-columns: minmax(0,1fr) 280px; gap: 25px; }
@@ -56,7 +56,7 @@
   .example-chips { gap: 5px; margin-top: 10px; }
   .example-chips button { min-height: 44px; font-size: 11px; padding: 7px 8px; gap: 3px; }
   .example-chips svg { width: 11px; }
-  .scene-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+  .scene-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
   .scene-option>span { min-height: 47px; flex-direction: row; gap: 7px; }
   .scene-option>span>svg { width: 18px; }
   .scene-option strong { font-size: 12px; }
