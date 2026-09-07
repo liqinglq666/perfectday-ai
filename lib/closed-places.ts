@@ -39,6 +39,7 @@ export function closedPlaceNotices(text: string) {
 /**
  * Convert a stale explicit merchant request into a current reviewed candidate.
  * Closed merchants themselves never enter preferred/excluded route IDs.
+ * For local parsing, an explicit closed merchant outranks a generic category word such as “咖啡”.
  */
 export function applyClosedPlaceHints(input: PlanInput): PlanInput {
   const matches = mentionedClosedPlaces(input.request);
@@ -47,10 +48,12 @@ export function applyClosedPlaceHints(input: PlanInput): PlanInput {
   const excluded = new Set(input.excludedPlaceIds || []);
   const preferred = new Set(input.preferredPlaceIds || []);
   for (const closed of matches) {
-    const alreadyPreferred = closed.alternativePlaceIds.some(id => preferred.has(id) && !excluded.has(id));
-    if (alreadyPreferred) continue;
     const replacement = closed.alternativePlaceIds.find(id => placeById.has(id) && !excluded.has(id));
-    if (replacement) preferred.add(replacement);
+    if (!replacement) continue;
+    const existing = closed.alternativePlaceIds.find(id => preferred.has(id) && !excluded.has(id));
+    // Bailian may have already resolved an explicit current merchant; keep that choice.
+    // Local fallback can contain a generic category default, so the ranked closed-place replacement must still be added.
+    if (!existing || input.intentSource !== "bailian") preferred.add(replacement);
   }
   return {
     ...input,
