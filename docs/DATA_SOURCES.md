@@ -20,6 +20,9 @@
 | 石岐万象汇 | 孙文东路28号 | [高德地址页](https://www.amap.com/place/B0HK7MJ1R6)，平台当前可检索 |
 | 博雅书店 | 假日广场南塔2–3楼 | [高德地址页](https://www.amap.com/place/B02F80296F)；文化介绍另据2026-04-24南方日报 |
 | DAKA咖啡 | 公开地址1F层2216 | [Trip.com](https://www.trip.com/restaurant/china/zhongshan/detail/restaurant-63461223/)，与OpenRice结果一致；修正旧版2层描述，出发前核对 |
+| UNIQLO 优衣库（中山假日广场店） | 假日广场1F | [UNIQLO官方门店页](https://www.uniqlo.com/cn/shop/shop366.html)，当前官方页面列出该店及1F地址；营业时间仍以品牌或商场现场为准 |
+| 大家乐（中山假日广场店） | 假日广场2F A10 | [Trip.com](https://www.trip.com/restaurant/china/zhongshan/detail/restaurant-171259/)，当前页面列出二楼A10并展示营业信息；不视为项目实时核验 |
+| 珠珑入水·手作糖水（假日广场店） | 假日广场1F G层C111-1 | [Trip.com](https://hk.trip.com/restaurant/china/zhongshan/detail/restaurant-130240822/)，当前页面列出该地址，并有2026年近期用户记录；不构成实时营业保证 |
 | 大渔玩家 | 万象汇L1层L128 | [高德地址页](https://www.amap.com/place/B0I02ZI49Y)；具体项目与年龄限制不作保证 |
 | 瑞幸咖啡 | 万象汇LG140 | [高德地址页](https://www.amap.com/place/B0IKU7BMXT) |
 | 宜得利 | 万象汇2F | [品牌官方2022-11-24开店公告](https://www.nitorihd.co.jp/news/items/cab19ac426e56252cef7c78fa0892a0d.pdf)；2025-09-12南方日报仍提及该品牌，历史营业时间不作为实时营业时间 |
@@ -29,7 +32,7 @@
 | 嗨贝天地、POP MART | 商圈内，确切铺位待确认 | [香港01，2026-05-23](https://global.hk01.com/旅游/60335969/中山商场7大-万象汇-汇丰城-coco-city-1商场被誉为平民版k11)，列出品牌，不提供可靠的具体铺位 |
 | 自由逛店 / 室内休息 | 商场公共区域 | 场景型停留建议，没有固定座椅位置与空位信息 |
 
-本版不再显示嗨贝天地L227和POP MART的旧楼层信息，因为本次核查的2026年资料只支持品牌收录。
+本版不再显示嗨贝天地L227和POP MART的旧楼层信息，因为本次核查的2026年资料只支持品牌收录。假日广场新增的购物、简餐和糖水候选用于减少“因为地点库太薄而被迫跨商场”的路线；当用户选择少走路、雨天或单商场倾向时，规划器可优先用同商场、同类别的已收录候选替换远端类别，再执行原有时间和预算约束。
 
 ## 事实、估算和未知分开维护
 
