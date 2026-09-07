@@ -1,5 +1,6 @@
 import type { Place } from "@/types";
 import { holidayCandidates } from "@/data/holiday-candidates";
+import { mealCandidates } from "@/data/meal-candidates";
 
 export const places: Place[] = [
   {
@@ -310,5 +311,6 @@ export const places: Place[] = [
     sourceLabel: "商圈公开资料",
     sourceUrl: "https://www.zsnews.cn/trade/index/view/cateid/45/id/698538.html"
   },
+  ...mealCandidates,
   ...holidayCandidates
 ];
