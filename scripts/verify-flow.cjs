@@ -8,7 +8,21 @@ const anchor = (html, phrase) => {
   for (const match of html.matchAll(/<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/g)) if (match[2].includes(phrase)) return match[1].replace(/&amp;/g, '&');
   throw new Error('Missing link: ' + phrase);
 };
-async function page(path) { const r = await fetch(new URL(path, origin)); assert.equal(r.status, 200, path); return r.text(); }
+// A loading boundary lets Next stream a page redirect as a refresh tag.
+// Follow that navigation just as a browser does, then inspect the destination.
+async function navigate(path, options) {
+  let response = await fetch(new URL(path, origin), options);
+  for (let hop = 0; hop < 4; hop++) {
+    const html = await response.clone().text();
+    const refresh = html.match(/<meta\b(?=[^>]*id="__next-page-redirect")[^>]*content="\d+;url=([^"]+)"/);
+    if (!refresh) return response;
+    const target = new URL(refresh[1].replace(/&amp;/g, '&'), origin);
+    assert.equal(target.origin, origin, 'redirect stays inside the app');
+    response = await fetch(target);
+  }
+  throw new Error('Redirect did not settle');
+}
+async function page(path) { const r = await navigate(path); assert.equal(r.status, 200, path); return r.text(); }
 (async () => {
   try {
     await ready;
@@ -26,7 +40,7 @@ async function page(path) { const r = await fetch(new URL(path, origin)); assert
     html = await page(url.href); assert(html.includes('16:35')); assert(html.includes('为什么移除'));
     assert(html.includes('form="remaining-form"'));
     url.searchParams.set('mode', 'save');
-    const saveResponse = await fetch(url.href);
+    const saveResponse = await navigate(url.href);
     const saved = saveResponse.url;
     const state = JSON.parse(new URL(saved, origin).searchParams.get('journey'));
     assert.equal(JSON.stringify(state.done), JSON.stringify(original.done));
@@ -35,13 +49,13 @@ async function page(path) { const r = await fetch(new URL(path, origin)); assert
     html = await page(anchor(html, '这一站逛完了')); assert(html.includes('告一段落')); assert(html.replace(/<[^>]*>/g, '').includes('已完成 3 站'));
     // Save newly typed values directly, without a separate preview request.
     url.searchParams.set('left', '30'); url.searchParams.set('cash', '10');
-    const directSave = await fetch(url.href);
+    const directSave = await navigate(url.href);
     const directState = JSON.parse(new URL(directSave.url).searchParams.get('journey'));
     assert.equal(directState.minutes, 30); assert.equal(directState.cash, 10);
     assert.equal(directState.pending.length, 0); assert.equal(directState.done.length, 2);
     const action = home.match(/name="(\$ACTION_ID_[^"]+)"/)[1];
     const body = new FormData(); body.set(action, ''); body.set('request', '一个人逛两小时，不喝咖啡，想逛宜得利'); body.set('scene', 'solo'); body.set('duration', '120'); body.set('budget', '100'); body.set('walking', 'low');
-    const result = await fetch(origin, { method: 'POST', body, headers: { Origin: origin } });
+    const result = await navigate(origin, { method: 'POST', body, headers: { Origin: origin } });
     assert.equal(result.status, 200); assert(result.url.includes('/trip?'));
     const resultPage = await result.text(); assert(resultPage.includes('NITORI')); assert(/基础(?:路线)?规划/.test(resultPage));
     console.log('PASS: server-rendered home, guide, completion, adjustment form with multiple flags, save, reload, finish, direct-save of edited conditions, and no-key form action.');
