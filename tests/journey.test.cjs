@@ -78,7 +78,7 @@ test('zero budget allows free browsing; zero time creates an honest empty remain
   const end = j.replanRemaining(base, { ...initial, minutes: 0 }).journey;
   assert.equal(end.pending.length, 0);
 });
-test('share links round trip completion, skipped stops, replacement, current position and balances', () => {
+test('share links round trip completion, skipped stops, real meal replacement, current position and balances', () => {
   let state = stateWith(['daka-coffee', 'connector', 'golden-food'], { current: 'holiday' });
   state = j.advanceJourney(base, state, true);
   state = j.advanceJourney(base, state);
@@ -88,7 +88,7 @@ test('share links round trip completion, skipped stops, replacement, current pos
   const decoded = j.readJourney(planner.parseInput(params), params);
   assert.equal(JSON.stringify(decoded), JSON.stringify(state));
   assert.equal(j.journeyPlan(decoded, base).stops[0].time, '17:35');
-  assert.equal(j.journeyPlan(decoded, base).stops[0].status, 'replaced');
+  assert.equal(j.journeyPlan(decoded, base).stops[0].id, 'golden-zhenlong');
 });
 test('preview is repeatable, supports multiselect HTML forms and never mutates history', () => {
   const state = stateWith(['daka-coffee', 'connector', 'golden-food']);
@@ -145,15 +145,54 @@ test('walking adjustment can replace far shopping with the reviewed Holiday Plaz
   assert.equal(result.journey.pending.map(stop => stop.id).join(','), 'holiday-uniqlo');
   assertFits(result.journey);
 });
-test('same-mall replacement never resurrects a completed stop and queue fallback names the current mall', () => {
+test('queue adjustment prefers named same-mall restaurants on both sides of the district', () => {
+  const golden = j.replanRemaining(base, stateWith(['golden-food'], { current: 'golden', minutes: 120, cash: 200 }), ['queue']);
+  assert.equal(golden.journey.pending[0].id, 'golden-zhenlong');
+  assert.match(golden.removed[0].reason, /臻龙/);
+  assert.equal(j.journeyPlan(golden.journey, base).stops[0].evidenceStatus, 'online_listing');
+
+  const holiday = j.replanRemaining(base, stateWith(['holiday-cafe-de-coral'], { current: 'holiday', minutes: 120, cash: 100 }), ['queue']);
+  assert.equal(holiday.journey.pending[0].id, 'holiday-ajisen');
+  assert.match(holiday.removed[0].reason, /味千/);
+  assert.equal(j.journeyPlan(holiday.journey, base).stops[0].evidenceStatus, 'online_listing');
+});
+test('rain, walking, queue and shorter time each create a visible remaining-route change', () => {
+  const original = stateWith(['holiday-start', 'boya-bookstore', 'daka-coffee', 'connector', 'golden-food'], {
+    current: 'holiday', minutes: 240, cash: 300
+  });
+  const originalSignature = original.pending.map(stop => stop.id).join(',');
+
+  const rain = j.replanRemaining(base, original, ['rain']);
+  const rainPlan = assertFits(rain.journey);
+  assert.notEqual(rain.journey.pending.map(stop => stop.id).join(','), originalSignature);
+  assert(rainPlan.stops.every(stop => stop.indoor));
+  assert.equal(new Set(rainPlan.stops.map(stop => stop.mall)).size, 1);
+
+  const walk = j.replanRemaining(base, original, ['walk']);
+  const walkPlan = assertFits(walk.journey);
+  assert.notEqual(walk.journey.pending.map(stop => stop.id).join(','), originalSignature);
+  assert.equal(new Set(walkPlan.stops.map(stop => stop.mall)).size, 1);
+
+  const queue = j.replanRemaining(base, original, ['queue']);
+  assert.notEqual(queue.journey.pending.map(stop => stop.id).join(','), originalSignature);
+  assert(queue.journey.pending.some(stop => stop.id === 'golden-zhenlong'));
+  assert(queue.removed.some(item => /排队时改为同商场备选/.test(item.reason)));
+  assertFits(queue.journey);
+
+  const shorter = j.replanRemaining(base, { ...original, minutes: 90 });
+  assert(shorter.journey.pending.length < original.pending.length);
+  assert(shorter.removed.some(item => /剩余时间不足/.test(item.reason)));
+  assertFits(shorter.journey);
+});
+test('same-mall replacement never resurrects a completed stop and queue can continue to a second real meal fallback', () => {
   const done = [{ id: 'daka-coffee', t: 840, d: 45, p: 32, w: 4 }];
   const state = stateWith(['connector', 'luckin-coffee', 'golden-food'], { current: 'holiday', done, minutes: 180, cash: 200 });
   const result = j.replanRemaining(base, state, ['walk', 'queue']);
   assert(!result.journey.pending.some(stop => stop.id === 'daka-coffee'));
   assert(result.journey.pending.some(stop => stop.id === 'holiday-dessert'));
+  assert(result.journey.pending.some(stop => stop.id === 'holiday-ajisen'));
   const food = j.journeyPlan(result.journey, base).stops.find(stop => stop.category === 'food');
   assert(food);
-  assert.match(food.name, /假日广场/);
-  assert.doesNotMatch(food.name, /石岐万象汇/);
+  assert.equal(food.id, 'holiday-ajisen');
   assertFits(result.journey);
 });
