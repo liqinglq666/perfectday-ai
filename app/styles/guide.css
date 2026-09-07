@@ -1,0 +1,52 @@
+/* Local context that is easy to scan and search. */
+.guide-page>.back-link { margin-bottom: 13px; }
+.guide-intro { max-width: 760px; margin: 6px 0 26px; }
+.guide-intro h1 { font-size: 40px; line-height: 1.45; margin: 13px 0 18px; }
+.guide-intro>p:not(.eyebrow) { font-size: 15px; color: var(--muted); line-height: 1.95; }
+.guide-intro .planning-status { margin-top: 20px; }
+.guide-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 29px 0; }
+.guide-nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; border-radius: 20px; border: 1px solid #d0ddc8; background: #fdfefb; padding: 8px 19px; font-size: 13px; color: #556e48; }
+.guide-facts, .demo-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; }
+.guide-facts article, .demo-grid article { border: 1px solid var(--border); background: #fff; border-radius: 18px; padding: 24px; }
+.guide-facts article>span, .demo-grid small { font-size: 10px; letter-spacing: .9px; color: #718360; }
+.guide-facts h2 { font-size: 20px; margin: 14px 0 11px; }
+.guide-facts p, .arrival-grid p, .demo-grid p, .value-note p { font-size: 13px; color: var(--muted); line-height: 1.95; }
+.guide-facts a, .demo-grid a { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; font-size: 11px; color: #4e6c41; margin-top: 12px; }
+.guide-section { margin-top: 47px; }
+.arrival-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 17px; }
+.arrival-grid article { background: #edf2e7; border-radius: 16px; padding: 24px; }
+.arrival-grid article>svg { color: #638051; }
+.arrival-grid h3 { font-size: 17px; margin: 11px 0 8px; }
+.directory-browser { margin-top: 23px; }
+.directory-tools { display: flex; align-items: center; gap: 18px; }
+.directory-search { display: flex; align-items: center; gap: 9px; border: 1px solid #cad9c1; border-radius: 12px; background: #fff; padding: 0 14px; flex: 1; min-width: 0; color: #6c825d; }
+.directory-search input { background: transparent; min-width: 0; width: 100%; border: 0; outline: none; min-height: 48px; font-size: 14px; color: var(--ink); }
+.directory-search:focus-within { outline: 2px solid #7a9867; outline-offset: 2px; }
+.mall-filters { display: flex; gap: 5px; }
+.mall-filters button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; border-radius: 9px; padding: 8px 13px; background: transparent; color: #6a7a5d; font-size: 12px; border: 1px solid transparent; }
+.mall-filters button[aria-pressed="true"] { background: #e5eedc; color: #3e6030; border-color: #bcccaf; }
+.directory-count { font-size: 11px; color: var(--muted); margin: 13px 0 16px; }
+.place-directory { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.directory-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 19px 21px 10px; min-width: 0; }
+.directory-card-head { display: flex; align-items: center; gap: 12px; }
+.directory-card-head>div { min-width: 0; }
+.directory-card-head small { font-size: 10px; color: var(--muted); }
+.directory-card-head h3 { font-size: 16px; margin-top: 4px; line-height: 1.6; }
+.category-stamp { display: grid; place-items: center; width: 44px; height: 48px; flex-shrink: 0; border-radius: 12px; background: #eaf0e2; color: #637c4e; }
+.category-coffee { background: #f3e8dd; color: #9b6a49; }
+.category-culture { background: #eae9f0; color: #7a718f; }
+.category-food { background: #f5e9de; color: #a97648; }
+.directory-floor { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 11px; margin: 15px 0 6px; }
+.directory-card-actions { display: flex; align-items: center; justify-content: space-between; }
+.directory-card-actions a { font-size: 12px; color: #426536; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
+.directory-card-actions>span { font-size: 10px; border-radius: 5px; background: #f0f5e8; color: #688452; padding: 2px 7px; }
+.directory-card details { border-top: 1px solid #e7eede; margin-top: 5px; }
+.directory-card summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; color: var(--muted); }
+.directory-card details[open] summary svg { transform: rotate(90deg); }
+.directory-card details p { font-size: 12px; line-height: 1.9; color: var(--muted); padding: 5px 0 8px; }
+.directory-card details a { font-size: 11px; color: #476b3c; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.demo-grid h3 { font-size: 17px; margin: 11px 0; }
+.value-note { background: #eaf0e0; border-radius: 20px; padding: 32px; margin-top: 46px; }
+.value-note h2 { font-size: 26px; margin: 11px 0; }
+.value-note p+p { margin-top: 10px; }
+.value-note a { margin-top: 21px; }
