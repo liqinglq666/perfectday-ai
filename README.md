@@ -54,6 +54,7 @@ npm run dev
 npm test
 npm run typecheck
 npm run build
+npm run test:flow
 ```
 
 GitHub Actions 会对 `main` 与 Pull Request 自动执行同样的检查。

@@ -1935,3 +1935,6 @@ textarea::placeholder {
   .value-note h2 { font-size:23px; }
   .guide-section .section-heading { align-items:flex-start;gap:10px;flex-wrap:wrap; }
 }
+
+.trip-summary h1 { text-wrap:balance; }
+button.use-route { width:100%;font:inherit;cursor:pointer; }
