@@ -196,6 +196,8 @@ function summarize(items: Place[], copy: { title: string; subtitle: string }): T
 export function createPlan(rawInput: PlanInput): TripPlan {
   const input = applyRequestHints(rawInput);
   let selected = applyResolvedPlaces(templates[input.scene].map(byId), input);
+  // Public reports confirm connection, but do not establish a fully sheltered path.
+  if (input.indoorOnly || input.scene === "rain") selected = oneMall(selected, input.preferredPlaceIds, input.scene);
   if (input.excludedPlaceIds?.includes("connector")) selected = oneMall(selected, input.preferredPlaceIds, input.scene);
   if (input.walking === "low") {
     const preferredMalls = new Set(selected.filter((item) => input.preferredPlaceIds?.includes(item.id)).map((item) => item.mall));
@@ -209,7 +211,7 @@ export function adjustPlan(rawInput: PlanInput, change: AdjustmentChange | Adjus
   const base = createPlan(input);
   const changes = new Set(Array.isArray(change) ? change : [change]);
   let stops: TripStop[] = base.stops.map((stop) => ({ ...stop, status: "kept" }));
-  if (changes.has("rain")) stops = stops.filter((stop) => stop.indoor);
+  if (changes.has("rain")) stops = oneMall(stops.filter((stop) => stop.indoor), input.preferredPlaceIds, input.scene);
   if (changes.has("walk")) stops = oneMall(stops, input.preferredPlaceIds, input.scene);
   if (changes.has("queue")) {
     stops = stops.map((stop) => stop.category === "food" ? {
@@ -232,7 +234,7 @@ export function adjustPlan(rawInput: PlanInput, change: AdjustmentChange | Adjus
 }
 
 export function parseChanges(params: Record<string, string | string[] | undefined>): AdjustmentChange[] {
-  const raw = typeof params.changes === "string" ? params.changes : typeof params.change === "string" ? params.change : "";
+  const raw = Array.isArray(params.changes) ? params.changes.slice(0, 4).join(",") : typeof params.changes === "string" ? params.changes : typeof params.change === "string" ? params.change : "";
   return [...new Set(raw.slice(0, 100).split(",").map(parseChange).filter((value): value is AdjustmentChange => value !== null))];
 }
 

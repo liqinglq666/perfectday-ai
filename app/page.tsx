@@ -21,7 +21,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       <section className="home-intro" aria-labelledby="home-title">
         <p className="eyebrow"><span/>一个商圈，许多种好时光</p>
         <h1 id="home-title">今天，<br className="desktop-break"/><em>慢慢逛。</em></h1>
-        <p className="intro-copy">从一杯咖啡到一顿好饭，<br/>把喜欢的地方串成一条顺路的行程。</p>
+        <p className="intro-copy">从一杯咖啡到一顿好饭，<br/>把喜欢的地方串成行程，途中变化也能接着走。</p>
         <div className="home-hero"><Image src="/images/city-afternoon.webp" alt="绿树与暖阳下的商圈步行街氛围示意" fill priority sizes="(max-width: 760px) 100vw, 48vw"/><div className="hero-caption"><span><Icon name="pin" size={16}/>假日广场 × 完美金鹰</span><small>AI 氛围图</small></div></div>
       </section>
       <form action={generateTrip} className="planner-panel">
@@ -41,6 +41,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <div className="inspiration-image"><Image src={`/images/${item.image}.webp`} alt="" fill sizes="(max-width: 760px) 76vw, 33vw"/><span>{item.tag}</span></div><div className="inspiration-content"><small>0{index + 1} / 半日灵感</small><h3>{item.title}</h3><p>{item.meta}</p><span className="card-arrow"><Icon name="arrow"/></span></div>
       </Link>)}</div>
     </section>
+    <div className="home-guide-link"><div><strong>围绕中山真实商圈，安排下一站</strong><p>公开地点资料、到店提示，还有可以直接体验的途中重排。</p></div><Link href="/guide" className="text-link">看看商圈指南<Icon name="arrow" size={17}/></Link></div>
     <InstallTip/><footer className="site-footer"><span>PerfectDay AI · 把半天过成喜欢的样子</span><small>图片为 AI 生成的氛围示意，非商户实拍。</small></footer>
   </main></>;
 }

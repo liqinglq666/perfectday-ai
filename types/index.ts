@@ -37,6 +37,8 @@ export interface Place {
   searchKeyword?: string;
   sourceLabel?: string;
   sourceUrl?: string;
+  checkedAt?: string;
+  evidenceNote?: string;
   lat?: number;
   lng?: number;
 }
