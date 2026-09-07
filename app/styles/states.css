@@ -1,0 +1,12 @@
+.loading-label { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #667e56; margin: 20px 0 23px; }
+.skeleton { border-radius: 16px; background: #e7ece0; animation: breathe 1.6s ease-in-out infinite alternate; }
+.skeleton-title { width: 40%; height: 45px; margin-bottom: 30px; }
+.loading-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 34px; }
+.skeleton-feature { height: 260px; margin-bottom: 20px; }
+.skeleton-card { height: 100px; margin-bottom: 15px; }
+.skeleton-sidebar { height: 430px; }
+@keyframes breathe { to { opacity: .5; } }
+.error-page { max-width: 840px; padding-top: 80px; }
+.error-page h1 { margin: 15px 0; }
+.error-page>p:not(.eyebrow) { color: var(--muted); font-size: 15px; }
+.error-actions { display: flex; flex-wrap: wrap; gap: 13px; margin: 27px 0 35px; }
