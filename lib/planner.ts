@@ -89,7 +89,6 @@ function applyRequestHints(input: PlanInput): PlanInput {
     ["糖水|甜品|珠珑入水", ["holiday-dessert"]],
     ["咖啡", ["daka-coffee"]],
     ["瑞幸", ["luckin-coffee"]],
-    ["星巴克", ["golden-coffee"]],
     ["优衣库|UNIQLO|衣服|服装", ["holiday-uniqlo"]],
     ["大家乐|简餐|快餐", ["holiday-cafe-de-coral"]],
     ["运动|台球|保龄|射箭|游戏|主机|VR|互动|潮玩馆", ["dayu-player"]],
@@ -116,7 +115,7 @@ function applyRequestHints(input: PlanInput): PlanInput {
     places.filter((place) => place.mall === "假日广场").forEach((place) => excluded.add(place.id));
     excluded.add("connector");
   }
-  if (preferred.has("luckin-coffee") || preferred.has("golden-coffee") || preferred.has("holiday-dessert")) preferred.delete("daka-coffee");
+  if (preferred.has("luckin-coffee") || preferred.has("holiday-dessert")) preferred.delete("daka-coffee");
   if (preferred.has("holiday-cafe-de-coral")) preferred.delete("golden-food");
   return {
     ...input,
