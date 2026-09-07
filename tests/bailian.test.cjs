@@ -1,24 +1,17 @@
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
-const root = path.resolve(__dirname, '..');
-const ts = require(path.join(root, 'node_modules/typescript'));
-const modules = new Map();
+const { createTsLoader } = require('./helpers/load-ts.cjs');
+
 const fakeEnv = {};
 const logs = [];
 let calls = [];
 let reply;
 let simulateTimeout = false;
-function load(relative) {
-  if (modules.has(relative)) return modules.get(relative);
-  const compiled = ts.transpileModule(fs.readFileSync(path.join(root, relative + '.ts'), 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
-  }).outputText;
-  const exports = {};
-  const context = {
-    exports, require: name => name === 'server-only' ? {} : load(name.replace(/^@\//, '')),
-    process: { env: fakeEnv }, URL, URLSearchParams, AbortController,
+
+const load = createTsLoader({
+  requireOverrides: { 'server-only': {} },
+  globals: {
+    process: { env: fakeEnv },
+    AbortController,
     console: { warn: message => logs.push(message) },
     setTimeout: (callback, delay) => setTimeout(callback, simulateTimeout ? 5 : delay),
     clearTimeout,
@@ -26,11 +19,9 @@ function load(relative) {
       calls.push({ url: String(url), options });
       return reply(url, options);
     }
-  };
-  vm.runInNewContext(compiled, context, { filename: relative + '.ts' });
-  modules.set(relative, exports);
-  return exports;
-}
+  }
+});
+
 const { interpretWithBailian } = load('lib/bailian');
 const planner = load('lib/planner');
 const { places } = load('data/places');
