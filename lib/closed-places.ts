@@ -1,8 +1,7 @@
 import { closedPlaces, type ClosedPlace } from "@/data/closed-places";
-import { places } from "@/data/places";
+import { getPlace, hasPlace } from "@/lib/place-catalog";
 import type { PlanInput } from "@/types";
 
-const placeById = new Map(places.map(place => [place.id, place]));
 const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 function isNegated(text: string, alias: string) {
@@ -29,7 +28,7 @@ export function closedPlaceNotices(text: string) {
     sourceLabel: place.sourceLabel,
     sourceUrl: place.sourceUrl,
     alternatives: place.alternativePlaceIds
-      .map(id => placeById.get(id))
+      .map(getPlace)
       .filter((candidate): candidate is NonNullable<typeof candidate> => Boolean(candidate))
       .slice(0, 2)
       .map(candidate => ({ id: candidate.id, name: candidate.name, category: candidate.category }))
@@ -48,7 +47,7 @@ export function applyClosedPlaceHints(input: PlanInput): PlanInput {
   const excluded = new Set(input.excludedPlaceIds || []);
   const preferred = new Set(input.preferredPlaceIds || []);
   for (const closed of matches) {
-    const replacement = closed.alternativePlaceIds.find(id => placeById.has(id) && !excluded.has(id));
+    const replacement = closed.alternativePlaceIds.find(id => hasPlace(id) && !excluded.has(id));
     if (!replacement) continue;
     const existing = closed.alternativePlaceIds.find(id => preferred.has(id) && !excluded.has(id));
     // Bailian may have already resolved an explicit current merchant; keep that choice.
