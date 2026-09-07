@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useRef, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState, useTransition, type FormEvent } from "react";
 import Icon from "./ui-icon";
 import { formatMinutes } from "./trip-ui";
 import { applyRemainingFields, clockText, journeyPlan, journeyUrl, replanRemaining, type Journey } from "@/lib/journey";
@@ -11,7 +12,8 @@ const choices = [["rain", "rain", "下雨了", "留在一个商场的室内"], [
 const fieldsOf = (journey: Journey) => ({ left: String(journey.minutes), cash: String(journey.cash), from: clockText(journey.clock), current: journey.current as string });
 export default function AdjustEditor({ input, original, initial, initialChanges }: { input: PlanInput; original: Journey; initial: Journey; initialChanges: AdjustmentChange[] }) {
   const [values, setValues] = useState(() => fieldsOf(initial));
-  const [changes, setChanges] = useState(initialChanges), [saving, setSaving] = useState(false);
+  const [changes, setChanges] = useState(initialChanges), [saving, startSaving] = useTransition();
+  const router = useRouter();
   const previewRef = useRef<HTMLHeadingElement>(null);
   const draft = applyRemainingFields(original, values);
   const valid = /^\d+$/.test(values.left) && Number(values.left) <= 480 && /^\d+$/.test(values.cash) && Number(values.cash) <= 10000 && /^([01]\d|2[0-3]):[0-5]\d$/.test(values.from);
@@ -24,8 +26,11 @@ export default function AdjustEditor({ input, original, initial, initialChanges 
     if (!valid) { event.preventDefault(); return; }
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
     if (submitter?.value !== "save") { event.preventDefault(); preview(); return; }
-    setSaving(true);
-    try { sessionStorage.setItem(UNDO_TRIP_KEY, JSON.stringify({ from: journeyUrl(input, original), to: journeyUrl(input, journey), label: "保存这次调整" })); } catch { /* Saving does not require storage. */ }
+    event.preventDefault();
+    if (saving) return;
+    const target = journeyUrl(input, journey);
+    try { sessionStorage.setItem(UNDO_TRIP_KEY, JSON.stringify({ from: journeyUrl(input, original), to: target, label: "保存这次调整" })); } catch { /* Saving does not require storage. */ }
+    startSaving(() => router.push(target));
   }
   return <main id="main-content" className="page adjust-page"><div className="page-topline"><Link className="back-link" href={journeyUrl(input, original)}><Icon name="back" size={17}/>取消调整，返回行程</Link><span className="quiet-label">途中调整</span></div>
     <header className="adjust-heading"><p className="eyebrow">把下一段，安排得刚刚好</p><h1>计划有变，也没关系。</h1><p>已完成的 {doneCount} 站会保留，只调整还没去的地方。</p></header>
