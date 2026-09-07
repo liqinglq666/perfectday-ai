@@ -55,6 +55,33 @@ test('reviewed Holiday Plaza alternatives avoid crossing only because the local 
   assert(dessertPlan.stops.every(stop => stop.mall === '假日广场'));
   checkRoute(dessertPlan, 120, 100);
 });
+test('the three homepage quick demos keep clearly different route identities', () => {
+  const parents = planner.createPlan(planner.parseInput({
+    request: '陪爸妈逛两小时，想逛宜得利，不喝咖啡，尽量室内',
+    scene: 'family', duration: '120', budget: '100', walking: 'low'
+  }));
+  const friends = planner.createPlan(planner.parseInput({
+    request: '和朋友逛书店、喝咖啡，再吃晚饭',
+    scene: 'friends', duration: '240', budget: '300', walking: 'normal'
+  }));
+  const family = planner.createPlan(planner.parseInput({
+    request: '带孩子在室内玩，安排亲子乐园，少走路',
+    scene: 'family', duration: '180', budget: '300', walking: 'low'
+  }));
+
+  assert(parents.stops.some(stop => stop.id === 'nitori'));
+  assert(parents.stops.every(stop => stop.category !== 'coffee'));
+  assert(friends.stops.some(stop => stop.id === 'boya-bookstore'));
+  assert(friends.stops.some(stop => stop.category === 'coffee'));
+  assert(friends.stops.some(stop => stop.category === 'food'));
+  assert(family.stops.some(stop => stop.id === 'golden-family'));
+
+  const signatures = [parents, friends, family].map(plan => plan.stops.map(stop => stop.id).join(','));
+  assert.equal(new Set(signatures).size, 3, `demo routes must differ: ${signatures.join(' | ')}`);
+  checkRoute(parents, 120, 100);
+  checkRoute(friends, 240, 300);
+  checkRoute(family, 180, 300);
+});
 test('all scene, time, budget and walking combinations respect limits', () => {
   for (const scene of ['date', 'family', 'parents', 'friends', 'solo', 'rain'])
     for (const duration of [90, 120, 180, 240, 360, 480])
