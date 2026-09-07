@@ -47,16 +47,6 @@ textarea::placeholder { color: #7a867a; }
 .recent-trip h2 { font-size: 17px; margin: 2px 0; }
 .recent-trip p { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
 .recent-trip a { white-space: nowrap; }
-.inspiration-section { margin-top: 56px; }
-.inspiration-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 22px; }
-.inspiration-card { background: #fff; border: 1px solid var(--border); border-radius: 19px; overflow: hidden; transition: transform .2s; }
-.inspiration-image { position: relative; height: 194px; overflow: hidden; }
-.inspiration-image>span { position: absolute; left: 15px; bottom: 14px; background: #ffffffed; padding: 5px 10px; border-radius: 7px; font-size: 11px; }
-.inspiration-content { position: relative; padding: 19px 21px 22px; }
-.inspiration-content small { color: #77816c; font-size: 10px; letter-spacing: .6px; }
-.inspiration-content h3 { font-size: 18px; margin: 7px 0; padding-right: 20px; }
-.inspiration-content p { color: var(--muted); font-size: 12px; line-height: 1.9; padding-right: 9px; }
-.card-arrow { position: absolute; right: 16px; top: 23px; color: #778a68; }
 .home-guide-link { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 25px 28px; margin: 34px 0 22px; background: #edf1e5; border-radius: 17px; }
 .home-guide-link strong { font-size: 17px; }
 .home-guide-link p { color: var(--muted); font-size: 13px; margin-top: 5px; }
