@@ -1,13 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
-const ts = require('typescript');
-const storage = {};
-vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname, '../lib/trip-storage.ts'), 'utf8'), {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
-}).outputText, { exports: storage, URL });
+const { createTsLoader } = require('./helpers/load-ts.cjs');
+
+const load = createTsLoader();
+const storage = load('lib/trip-storage');
 const href = '/trip?scene=friends&journey=%7B%22v%22%3A1%7D';
 const after = href + '&step=1';
 test('recent trip survives serialization and rejects corrupt or unsafe stored links', () => {
