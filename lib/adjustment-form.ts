@@ -1,6 +1,6 @@
 import { clockText, type Journey } from "@/lib/journey";
 
-export interface AdjustmentFields {
+export interface AdjustmentFields extends Record<string, string> {
   left: string;
   cash: string;
   from: string;
