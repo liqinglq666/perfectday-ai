@@ -85,9 +85,12 @@ function applyRequestHints(input: PlanInput): PlanInput {
   if (!text) return input;
   const mentions: [string, string[]][] = [
     ["书店|阅读|文创", ["boya-bookstore"]],
+    ["糖水|甜品|珠珑入水", ["holiday-dessert"]],
     ["咖啡", ["daka-coffee"]],
     ["瑞幸", ["luckin-coffee"]],
     ["星巴克", ["golden-coffee"]],
+    ["优衣库|UNIQLO|衣服|服装", ["holiday-uniqlo"]],
+    ["大家乐|简餐|快餐", ["holiday-cafe-de-coral"]],
     ["运动|台球|保龄|射箭|游戏|主机|VR|互动|潮玩馆", ["dayu-player"]],
     ["泡泡玛特|盲盒", ["popmart"]],
     ["宜得利|家居|家装|生活方式店", ["nitori"]],
@@ -104,7 +107,16 @@ function applyRequestHints(input: PlanInput): PlanInput {
   for (const [pattern, category] of [["咖啡", "coffee"], ["吃饭|晚餐|晚饭|餐厅", "food"], ["购物|逛店", "shopping"]]) {
     if (negative(pattern)) places.filter((place) => place.category === category).forEach((place) => excluded.add(place.id));
   }
-  if (preferred.has("luckin-coffee") || preferred.has("golden-coffee")) preferred.delete("daka-coffee");
+  if (/(?:只(?:逛|去|待在|留在)[^，。；！？]{0,8}假日广场|不(?:想)?去[^，。；！？]{0,6}(?:万象汇|完美金鹰))/.test(text)) {
+    places.filter((place) => place.mall !== "假日广场" && place.category !== "connector").forEach((place) => excluded.add(place.id));
+    excluded.add("connector");
+  }
+  if (/(?:只(?:逛|去|待在|留在)[^，。；！？]{0,8}(?:万象汇|完美金鹰)|不(?:想)?去[^，。；！？]{0,6}假日广场)/.test(text)) {
+    places.filter((place) => place.mall === "假日广场").forEach((place) => excluded.add(place.id));
+    excluded.add("connector");
+  }
+  if (preferred.has("luckin-coffee") || preferred.has("golden-coffee") || preferred.has("holiday-dessert")) preferred.delete("daka-coffee");
+  if (preferred.has("holiday-cafe-de-coral")) preferred.delete("golden-food");
   return {
     ...input,
     scene: inferScene(text, input.scene),
@@ -176,6 +188,25 @@ function oneMall<T extends Place>(items: T[], preferred: string[] = [], scene?: 
   return groups.sort((a, b) => score(b) - score(a))[0];
 }
 
+/** When a single-mall route drops a far-side category, use a reviewed same-category candidate if available. */
+function oneMallWithAlternatives(items: Place[], input: PlanInput): Place[] {
+  const selected = oneMall(items, input.preferredPlaceIds, input.scene);
+  if (!selected.length) return selected;
+  const mall = selected[0].mall;
+  const excluded = new Set(input.excludedPlaceIds || []);
+  const missingCategories = [...new Set(items
+    .filter((item) => item.category !== "connector" && item.mall !== mall)
+    .map((item) => item.category))];
+  let result = [...selected];
+  for (const category of missingCategories) {
+    if (result.some((item) => item.category === category)) continue;
+    const candidate = places.find((item) => item.mall === mall && item.category === category &&
+      item.tags.includes(input.scene) && !excluded.has(item.id));
+    if (candidate) result = insertBeforeFood(result, candidate);
+  }
+  return result;
+}
+
 function summarize(items: Place[], copy: { title: string; subtitle: string }): TripPlan {
   let elapsed = 0;
   const stops: TripStop[] = orderByMall(items).map((item) => {
@@ -197,11 +228,11 @@ export function createPlan(rawInput: PlanInput): TripPlan {
   const input = applyRequestHints(rawInput);
   let selected = applyResolvedPlaces(templates[input.scene].map(byId), input);
   // Public reports confirm connection, but do not establish a fully sheltered path.
-  if (input.indoorOnly || input.scene === "rain") selected = oneMall(selected, input.preferredPlaceIds, input.scene);
-  if (input.excludedPlaceIds?.includes("connector")) selected = oneMall(selected, input.preferredPlaceIds, input.scene);
+  if (input.indoorOnly || input.scene === "rain") selected = oneMallWithAlternatives(selected, input);
+  if (input.excludedPlaceIds?.includes("connector")) selected = oneMallWithAlternatives(selected, input);
   if (input.walking === "low") {
     const preferredMalls = new Set(selected.filter((item) => input.preferredPlaceIds?.includes(item.id)).map((item) => item.mall));
-    if (preferredMalls.size <= 1) selected = oneMall(selected, input.preferredPlaceIds, input.scene);
+    if (preferredMalls.size <= 1) selected = oneMallWithAlternatives(selected, input);
   }
   return summarize(withinLimits(selected, input), sceneCopy[input.scene]);
 }
