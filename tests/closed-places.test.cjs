@@ -36,10 +36,10 @@ test('Tims request is explained and redirected to a current coffee candidate', (
 test('explicitly rejected first replacement falls through to the next reviewed candidate', () => {
   const input = planner.parseInput({ ...baseParams, request: '想去Tims天好咖啡，但是不要瑞幸' });
   assert(input.excludedPlaceIds.includes('luckin-coffee'));
-  assert(input.preferredPlaceIds.includes('golden-coffee'));
+  assert(input.preferredPlaceIds.includes('daka-coffee'));
   assert(!input.preferredPlaceIds.includes('luckin-coffee'));
   const plan = planner.createPlan(input);
-  assert(plan.stops.some(stop => stop.id === 'golden-coffee'));
+  assert(plan.stops.some(stop => stop.id === 'daka-coffee'));
 });
 
 test('closed restaurants redirect to a reviewed restaurant rather than becoming unknown text', () => {
