@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import PlannerForm from "@/app/components/planner-form";
+import { RecentTripLink } from "@/app/components/trip-memory";
 import Header from "@/app/components/header";
 import Icon from "@/app/components/ui-icon";
 import InstallTip from "@/app/components/install-tip";
@@ -29,6 +30,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       </Link>)}</div>
     </section>
     <div className="home-guide-link"><div><strong>围绕中山真实商圈，安排下一站</strong><p>公开地点资料、到店提示，还有可以直接体验的途中重排。</p></div><Link href="/guide" className="text-link">看看商圈指南<Icon name="arrow" size={17}/></Link></div>
-    <InstallTip/><footer className="site-footer"><span>PerfectDay AI · 把半天过成喜欢的样子</span><small>图片为 AI 生成的氛围示意，非商户实拍。</small></footer>
+    <RecentTripLink/><InstallTip/><footer className="site-footer"><span>PerfectDay AI · 把半天过成喜欢的样子</span><small>图片为 AI 生成的氛围示意，非商户实拍。</small></footer>
   </main></>;
 }
