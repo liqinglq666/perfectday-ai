@@ -36,7 +36,7 @@ export const holidayCandidates: Place[] = [
     floor: "2F · A10",
     address: "中山市石岐街道兴中道6号假日广场二楼A10商铺",
     category: "food",
-    tags: ["family", "parents", "friends", "solo", "rain"],
+    tags: ["date", "family", "parents", "friends", "solo", "rain"],
     duration: 50,
     price: 45,
     indoor: true,
