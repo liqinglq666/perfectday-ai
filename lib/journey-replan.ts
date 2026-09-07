@@ -9,6 +9,7 @@ import {
 import type { AdjustmentChange, PlanInput, Place } from "@/types";
 
 const replaceableCategories = new Set<Place["category"]>(["coffee", "food", "shopping"]);
+const queueOnlyMealIds = new Set(["golden-zhenlong", "golden-longfa", "holiday-ajisen"]);
 const evidenceRank = { online_listing: 2, published_reference: 1, public_area: 0 } as const;
 const precisionRank = { exact: 2, mall: 1, area: 0 } as const;
 
@@ -35,6 +36,7 @@ function bestSameMallAlternative(source: Place, chosen: Mall, input: PlanInput, 
     .filter(place =>
       mallKey(place) === chosen &&
       place.category === source.category &&
+      !queueOnlyMealIds.has(place.id) &&
       !unavailable.has(place.id) &&
       !input.excludedPlaceIds?.includes(place.id) &&
       (!needsIndoor || place.indoor) &&
@@ -61,6 +63,7 @@ function bestQueueAlternative(source: Place, input: PlanInput, unavailable: Set<
       place.tags.includes(input.scene))
     .sort((a, b) =>
       Number(input.preferredPlaceIds?.includes(b.id) || false) - Number(input.preferredPlaceIds?.includes(a.id) || false) ||
+      Number(queueOnlyMealIds.has(b.id)) - Number(queueOnlyMealIds.has(a.id)) ||
       evidenceRank[b.evidenceStatus] - evidenceRank[a.evidenceStatus] ||
       precisionRank[b.locationPrecision] - precisionRank[a.locationPrecision] ||
       a.price - b.price || a.walkMinutes - b.walkMinutes)[0] || null;
