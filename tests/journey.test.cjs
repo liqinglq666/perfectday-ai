@@ -145,3 +145,28 @@ test('rain never re-inserts an unverified sheltered crossing in initial routes',
   assert(plan.stops.every(stop => stop.indoor));
   assert.equal(new Set(plan.stops.map(stop => stop.mall)).size, 1);
 });
+test('walking adjustment replaces a far meal with a reviewed Holiday Plaza meal instead of only deleting it', () => {
+  const state = stateWith(['connector', 'golden-food'], { current: 'holiday', minutes: 180, cash: 200 });
+  const result = j.replanRemaining(base, state, ['walk']);
+  assert.equal(result.journey.pending.map(stop => stop.id).join(','), 'holiday-cafe-de-coral');
+  assert.match(result.removed.find(item => item.id === 'golden-food').reason, /大家乐/);
+  assertFits(result.journey);
+});
+test('walking adjustment can replace far shopping with the reviewed Holiday Plaza UNIQLO candidate', () => {
+  const state = stateWith(['connector', 'golden-shopping'], { current: 'holiday', minutes: 120, cash: 100 });
+  const result = j.replanRemaining(base, state, ['walk']);
+  assert.equal(result.journey.pending.map(stop => stop.id).join(','), 'holiday-uniqlo');
+  assertFits(result.journey);
+});
+test('same-mall replacement never resurrects a completed stop and queue fallback names the current mall', () => {
+  const done = [{ id: 'daka-coffee', t: 840, d: 45, p: 32, w: 4 }];
+  const state = stateWith(['connector', 'golden-coffee', 'golden-food'], { current: 'holiday', done, minutes: 180, cash: 200 });
+  const result = j.replanRemaining(base, state, ['walk', 'queue']);
+  assert(!result.journey.pending.some(stop => stop.id === 'daka-coffee'));
+  assert(result.journey.pending.some(stop => stop.id === 'holiday-dessert'));
+  const food = j.journeyPlan(result.journey, base).stops.find(stop => stop.category === 'food');
+  assert(food);
+  assert.match(food.name, /假日广场/);
+  assert.doesNotMatch(food.name, /石岐万象汇/);
+  assertFits(result.journey);
+});
