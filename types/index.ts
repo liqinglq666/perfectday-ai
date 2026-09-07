@@ -4,6 +4,8 @@ export type Walking = "normal" | "low";
 export type AdjustmentChange = "rain" | "walk" | "budget" | "queue";
 
 export type PlaceCategory = "start" | "culture" | "coffee" | "food" | "shopping" | "family" | "rest" | "connector" | "activity";
+export type EvidenceStatus = "online_listing" | "published_reference" | "public_area";
+export type LocationPrecision = "exact" | "mall" | "area";
 
 export interface PlanInput {
   request: string;
@@ -33,7 +35,8 @@ export interface Place {
   icon: string;
   accent: string;
   visual: string;
-  verified: boolean;
+  evidenceStatus: EvidenceStatus;
+  locationPrecision: LocationPrecision;
   searchKeyword?: string;
   sourceLabel?: string;
   sourceUrl?: string;

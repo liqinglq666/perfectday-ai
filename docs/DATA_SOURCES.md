@@ -33,7 +33,13 @@
 
 ## 事实、估算和未知分开维护
 
-- `sourceLabel`、`sourceUrl`、`checkedAt`、`evidenceNote`：来源、查阅时间和支持范围。`verified`仅为旧数据结构兼容字段，不能解释为实地核验。
+地点不再使用 `verified: boolean`。在线资料核对不能等同于实地核验，因此拆成两个独立维度：
+
+- `evidenceStatus`：证据性质。`online_listing` 表示当前可访问的地图、门店或平台列表；`published_reference` 表示官方公告或媒体公开资料；`public_area` 表示商场公共区域或场景型停留点。
+- `locationPrecision`：位置精度。`exact` 表示公开资料支持到楼层/铺位；`mall` 表示仅支持位于该商场；`area` 表示公共区域或连通区域。
+- `checkedAt`：本项目查阅资料的日期，不是商户营业确认日期。
+- `sourceLabel`、`sourceUrl`、`evidenceNote`：记录来源和该来源实际能支持到什么程度。
+- 上述字段均不代表实地走访，也不代表实时营业确认。
 - `duration`、`price`、`walkMinutes`：规划估算。付费项目按人均预留；购物、购书、饮品、付费活动另计。价格为0的浏览安排不构成免费服务承诺。
 - `indoor`：室内候选场景；跨商圈连通口不作已核实全程室内处理。
 - 营业状态、实时排队、票价、停车余位、无台阶通路、精确服务设施位置：尚未接入。
