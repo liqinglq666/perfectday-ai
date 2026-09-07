@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import PlannerForm from "@/app/components/planner-form";
-import { RecentTrip } from "@/app/components/trip-memory";
 import Header from "@/app/components/header";
 import Icon from "@/app/components/ui-icon";
 import InstallTip from "@/app/components/install-tip";
@@ -15,7 +14,6 @@ const inspirations = [
 export default async function HomePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const input = parseInput(await searchParams, false);
   return <><Header/><main id="main-content" className="page home-page">
-    <RecentTrip/>
     <div className="planning-layout">
       <section className="home-intro" aria-labelledby="home-title">
         <p className="eyebrow"><span/>中山 · 双商圈随行助手</p>
