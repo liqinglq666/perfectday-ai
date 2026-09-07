@@ -49,6 +49,25 @@ test('Chinese hours, named preferences and negative coffee request work without 
   assert.equal(planner.parseInput({ request: '两小时半' }).duration, 150);
   assert.equal(planner.parseInput({ request: '半天' }).duration, 240);
 });
+test('reviewed Holiday Plaza alternatives avoid crossing only because the local catalog was thin', () => {
+  const dateLow = planner.createPlan({ ...base, scene: 'date', walking: 'low' });
+  assert(dateLow.stops.length > 0);
+  assert(dateLow.stops.every(stop => stop.mall === '假日广场'));
+  assert(dateLow.stops.some(stop => stop.id === 'holiday-cafe-de-coral'));
+  assert(dateLow.stops.every(stop => stop.category !== 'connector'));
+  checkRoute(dateLow, 240, 500);
+
+  const soloLow = planner.createPlan({ ...base, scene: 'solo', walking: 'low' });
+  assert(soloLow.stops.every(stop => stop.mall === '假日广场'));
+  assert(soloLow.stops.some(stop => stop.id === 'holiday-uniqlo'));
+  checkRoute(soloLow, 240, 500);
+
+  const dessertInput = planner.parseInput({ request: '一个人想吃糖水，少走路，逛两小时，预算100元' });
+  const dessertPlan = planner.createPlan(dessertInput);
+  assert(dessertPlan.stops.some(stop => stop.id === 'holiday-dessert'));
+  assert(dessertPlan.stops.every(stop => stop.mall === '假日广场'));
+  checkRoute(dessertPlan, 120, 100);
+});
 test('all scene, time, budget and walking combinations respect limits', () => {
   for (const scene of ['date', 'family', 'parents', 'friends', 'solo', 'rain'])
     for (const duration of [90, 120, 180, 240, 360, 480])
