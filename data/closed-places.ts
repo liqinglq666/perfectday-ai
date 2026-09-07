@@ -28,7 +28,7 @@ export const closedPlaces: ClosedPlace[] = [
     closureLabel: "2026年5月25日营业结束后永久闭店",
     sourceLabel: "南方都市报 · 2026-05-25",
     sourceUrl: "https://m.sohu.com/a/1027432689_161795",
-    alternativePlaceIds: ["luckin-coffee", "golden-coffee", "daka-coffee"]
+    alternativePlaceIds: ["luckin-coffee", "daka-coffee"]
   },
   {
     id: "closed-coucou-shiqi",
