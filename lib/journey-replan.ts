@@ -9,6 +9,8 @@ import {
 import type { AdjustmentChange, PlanInput, Place } from "@/types";
 
 const replaceableCategories = new Set<Place["category"]>(["coffee", "food", "shopping"]);
+const evidenceRank = { online_listing: 2, published_reference: 1, public_area: 0 } as const;
+const precisionRank = { exact: 2, mall: 1, area: 0 } as const;
 
 /** Group onward stops from the user's current mall; never insert an orphan crossing. */
 function onward(items: StopRef[], current: Journey["current"], crossed: boolean): StopRef[] {
@@ -28,8 +30,6 @@ function bestSameMallAlternative(source: Place, chosen: Mall, input: PlanInput, 
   if (!replaceableCategories.has(source.category)) return null;
 
   const needsIndoor = input.indoorOnly || input.scene === "rain";
-  const evidenceRank = { online_listing: 2, published_reference: 1, public_area: 0 } as const;
-  const precisionRank = { exact: 2, mall: 1, area: 0 } as const;
 
   return allPlaces
     .filter(place =>
@@ -44,6 +44,26 @@ function bestSameMallAlternative(source: Place, chosen: Mall, input: PlanInput, 
       evidenceRank[b.evidenceStatus] - evidenceRank[a.evidenceStatus] ||
       precisionRank[b.locationPrecision] - precisionRank[a.locationPrecision] ||
       a.walkMinutes - b.walkMinutes || a.price - b.price)[0] || null;
+}
+
+function bestQueueAlternative(source: Place, input: PlanInput, unavailable: Set<string>) {
+  const chosen = mallKey(source);
+  const needsIndoor = input.indoorOnly || input.scene === "rain";
+
+  return allPlaces
+    .filter(place =>
+      mallKey(place) === chosen &&
+      place.category === "food" &&
+      place.id !== source.id &&
+      !unavailable.has(place.id) &&
+      !input.excludedPlaceIds?.includes(place.id) &&
+      (!needsIndoor || place.indoor) &&
+      place.tags.includes(input.scene))
+    .sort((a, b) =>
+      Number(input.preferredPlaceIds?.includes(b.id) || false) - Number(input.preferredPlaceIds?.includes(a.id) || false) ||
+      evidenceRank[b.evidenceStatus] - evidenceRank[a.evidenceStatus] ||
+      precisionRank[b.locationPrecision] - precisionRank[a.locationPrecision] ||
+      a.price - b.price || a.walkMinutes - b.walkMinutes)[0] || null;
 }
 
 /** Replace portable far-away categories with reviewed candidates in the chosen mall before deleting them. */
@@ -111,7 +131,27 @@ export function replanRemaining(input: PlanInput, journey: Journey, changes: Adj
   }
 
   if (flags.has("queue")) {
-    items = items.map(ref => resolveStop(ref).category === "food" ? { id: ref.id, q: 1 } : ref);
+    const unavailable = new Set<string>([
+      ...journey.done.map(ref => ref.id),
+      ...journey.skipped,
+      ...(input.excludedPlaceIds || []),
+      ...items.map(ref => ref.id)
+    ]);
+
+    items = items.map(ref => {
+      const source = resolveStop(ref);
+      if (source.category !== "food") return ref;
+
+      unavailable.delete(ref.id);
+      const alternative = bestQueueAlternative(source, input, unavailable);
+      unavailable.add(ref.id);
+
+      if (!alternative) return { id: ref.id, q: 1 };
+
+      unavailable.add(alternative.id);
+      removed.set(ref.id, `排队时改为同商场备选：${alternative.name}`);
+      return { id: alternative.id };
+    });
   }
 
   if (flags.has("budget")) {
