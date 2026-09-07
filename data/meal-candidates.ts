@@ -1,7 +1,7 @@
 import type { Place } from "@/types";
 
 /**
- * Reviewed meal candidates added only to improve same-mall fallback and queue handling.
+ * Reviewed MixC-side meal candidates added only to improve same-mall fallback and queue handling.
  * Public listings were checked on 2026-09-07; they are not real-time queue or opening guarantees.
  */
 export const mealCandidates: Place[] = [
@@ -52,29 +52,5 @@ export const mealCandidates: Place[] = [
     sourceLabel: "HKT 中山石岐万象汇优惠页 · 2026",
     evidenceNote: "2026年全年优惠页明确列出L405店铺；不代表实时排队或营业状态。",
     sourceUrl: "https://www.hkt.com/assets/HKTCorpsite/files/consumer/zhongshan-shiqi-mixc/zh.html"
-  },
-  {
-    id: "holiday-ajisen",
-    name: "味千拉面（中山假日广场店）",
-    mall: "假日广场",
-    floor: "1F · A100",
-    address: "中山市石岐区兴中道6号假日广场1F A100",
-    category: "food",
-    tags: ["date", "family", "parents", "friends", "solo", "rain"],
-    duration: 45,
-    price: 45,
-    indoor: true,
-    walkMinutes: 3,
-    note: "适合作为假日广场内的快捷正餐备选；人均45元为路线预算估算，实际菜单、价格与营业情况以门店为准。",
-    icon: "♨",
-    accent: "orange",
-    visual: "/visuals/dining.svg",
-    evidenceStatus: "online_listing",
-    locationPrecision: "exact",
-    checkedAt: "2026-09-07",
-    searchKeyword: "味千拉面 中山假日广场店",
-    sourceLabel: "Apple Maps 门店页",
-    evidenceNote: "当前门店页列出假日广场1F A100、营业时间及人均信息；不代表实时排队状态。",
-    sourceUrl: "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F8392D517A48"
   }
 ];
