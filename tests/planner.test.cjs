@@ -1,21 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
-const ts = require('typescript');
-const root = path.resolve(__dirname, '..');
-const modules = new Map();
-function load(name) {
-  if (modules.has(name)) return modules.get(name);
-  const code = ts.transpileModule(fs.readFileSync(path.join(root, name + '.ts'), 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
-  }).outputText;
-  const exports = {};
-  vm.runInNewContext(code, { exports, require: name => load(name.replace(/^@\//, '')), URLSearchParams });
-  modules.set(name, exports);
-  return exports;
-}
+const { createTsLoader } = require('./helpers/load-ts.cjs');
+
+const load = createTsLoader();
 const planner = load('lib/planner');
 const { places } = load('data/places');
 const base = { request: '', scene: 'friends', duration: 240, budget: '500', walking: 'normal' };
