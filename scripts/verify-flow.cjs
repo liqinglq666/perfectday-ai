@@ -33,6 +33,7 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
     assert(!guide.includes('试着处理一次途中变化'));
     assert(!guide.includes('非试用记录'));
     let html = await page('/trip?scene=friends&duration=360&budget=300&walking=normal');
+    assert(html.includes('本次为你考虑'));
     html = await page(anchor(html, '这一站逛完了'));
     html = await page(anchor(html, '这一站逛完了'));
     const adjustment = anchor(html, '重排剩余行程');
@@ -61,7 +62,12 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
     const body = new FormData(); body.set(action, ''); body.set('request', '一个人逛两小时，不喝咖啡，想逛宜得利'); body.set('scene', 'solo'); body.set('duration', '120'); body.set('budget', '100'); body.set('walking', 'low');
     const result = await navigate(origin, { method: 'POST', body, headers: { Origin: origin } });
     assert.equal(result.status, 200); assert(result.url.includes('/trip?'));
-    const resultPage = await result.text(); assert(resultPage.includes('NITORI')); assert(/基础(?:路线)?规划/.test(resultPage));
-    console.log('PASS: server-rendered home, simplified guide, completion, adjustment form with multiple flags, save, reload, finish, direct-save of edited conditions, and no-key form action.');
+    const resultPage = await result.text();
+    assert(resultPage.includes('NITORI'));
+    assert(resultPage.includes('本次为你考虑'));
+    assert(resultPage.includes('想去 NITORI 宜得利'));
+    assert(resultPage.includes('不安排咖啡'));
+    assert(/基础(?:路线)?规划/.test(resultPage));
+    console.log('PASS: server-rendered home, simplified guide, trip intent explanation, completion, adjustment form with multiple flags, save, reload, finish, direct-save of edited conditions, and no-key form action.');
   } finally { clearTimeout(timeout); server.kill(); }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });
