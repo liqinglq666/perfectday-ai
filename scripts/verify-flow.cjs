@@ -27,7 +27,11 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
   try {
     await ready;
     const home = await page('/'); assert(home.includes('商圈指南'));
-    const guide = await page('/guide'); assert(guide.includes('非试用记录')); assert(guide.includes('1F · 2216'));
+    const guide = await page('/guide');
+    assert(guide.includes('商圈地点，一起看看'));
+    assert(guide.includes('1F · 2216'));
+    assert(!guide.includes('试着处理一次途中变化'));
+    assert(!guide.includes('非试用记录'));
     let html = await page('/trip?scene=friends&duration=360&budget=300&walking=normal');
     html = await page(anchor(html, '这一站逛完了'));
     html = await page(anchor(html, '这一站逛完了'));
@@ -58,6 +62,6 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
     const result = await navigate(origin, { method: 'POST', body, headers: { Origin: origin } });
     assert.equal(result.status, 200); assert(result.url.includes('/trip?'));
     const resultPage = await result.text(); assert(resultPage.includes('NITORI')); assert(/基础(?:路线)?规划/.test(resultPage));
-    console.log('PASS: server-rendered home, guide, completion, adjustment form with multiple flags, save, reload, finish, direct-save of edited conditions, and no-key form action.');
+    console.log('PASS: server-rendered home, simplified guide, completion, adjustment form with multiple flags, save, reload, finish, direct-save of edited conditions, and no-key form action.');
   } finally { clearTimeout(timeout); server.kill(); }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });
