@@ -7,8 +7,70 @@ import NextStopPanel from "@/app/components/trip/next-stop-panel";
 import TripHistory from "@/app/components/trip/trip-history";
 import TripSummary from "@/app/components/trip/trip-summary";
 import { closedPlaceNotices } from "@/lib/closed-places";
+import { BUDGET_CAP, SCENE_COPY } from "@/lib/plan-config";
+import { allPlaces, getPlace } from "@/lib/place-catalog";
 import { parseInput, queryString } from "@/lib/planner";
 import { decodeJourney, journeyPlan, journeyUrl, readJourney } from "@/lib/journey";
+import type { PlaceCategory, PlanInput } from "@/types";
+
+const CATEGORY_LABELS: Partial<Record<PlaceCategory, string>> = {
+  culture: "书店/文化",
+  coffee: "咖啡/甜品",
+  food: "正餐",
+  shopping: "购物",
+  family: "亲子",
+  activity: "娱乐"
+};
+
+const NEGATED_CATEGORIES: Array<[PlaceCategory, string]> = [
+  ["coffee", "不安排咖啡"],
+  ["food", "不安排正餐"],
+  ["shopping", "不安排购物"]
+];
+
+function compactPlaceName(name: string) {
+  return name.replace(/（[^）]+）/g, "").trim();
+}
+
+function durationLabel(minutes: number) {
+  return minutes % 60 === 0 ? `${minutes / 60}小时` : `${minutes}分钟`;
+}
+
+function inputSummary(input: PlanInput) {
+  const tags = [
+    SCENE_COPY[input.scene].title.split(" · ")[0],
+    durationLabel(input.duration),
+    `¥${BUDGET_CAP[input.budget]}内`,
+    input.walking === "low" ? "少走路" : "正常步行"
+  ];
+
+  if (input.indoorOnly || input.scene === "rain") tags.push("室内优先");
+
+  const preferred = (input.preferredPlaceIds || []).flatMap(id => {
+    const place = getPlace(id);
+    return place ? [place] : [];
+  });
+  if (preferred.length === 1) {
+    tags.push(`想去 ${compactPlaceName(preferred[0].name)}`);
+  } else if (preferred.length > 1) {
+    const categories = [...new Set(preferred.map(place => CATEGORY_LABELS[place.category]).filter(Boolean))];
+    if (categories.length) tags.push(`偏好 ${categories.slice(0, 3).join("、")}`);
+  }
+
+  const excluded = new Set(input.excludedPlaceIds || []);
+  const categoryNegation = NEGATED_CATEGORIES.find(([category]) => {
+    const candidates = allPlaces.filter(place => place.category === category);
+    return candidates.length > 0 && candidates.every(place => excluded.has(place.id));
+  });
+  if (categoryNegation) {
+    tags.push(categoryNegation[1]);
+  } else if (excluded.size === 1) {
+    const place = getPlace([...excluded][0]);
+    if (place) tags.push(`避开 ${compactPlaceName(place.name)}`);
+  }
+
+  return tags;
+}
 
 export default async function TripPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
@@ -31,6 +93,7 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
       : "基础路线规划";
   const [scene, title] = plan.title.split(" · ");
   const remainingPlan = { ...plan, stops: plan.stops.slice(1) };
+  const summaryTags = inputSummary(input);
 
   return <>
     <Header/>
@@ -49,6 +112,11 @@ export default async function TripPage({ searchParams }: { searchParams: Promise
         <div><p className="eyebrow">{scene} · PERFECTDAY</p><h1>{title || scene}</h1></div>
         <span className="planning-status"><Icon name="sparkles" size={15}/>{status}</span>
       </header>
+
+      <section className="trip-intent" aria-label="本次路线考虑条件">
+        <span>本次为你考虑</span>
+        <ul>{summaryTags.map(tag => <li key={tag}>{tag}</li>)}</ul>
+      </section>
 
       <RememberTrip href={currentHref} title={plan.title} done={doneCount} left={leftCount}/>
 
