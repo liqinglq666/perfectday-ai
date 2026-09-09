@@ -22,7 +22,7 @@ export const PLAN_TEMPLATES: Record<Scene, string[]> = {
   date: ["holiday-start", "boya-bookstore", "daka-coffee", "connector", "golden-food"],
   family: ["holiday-start", "boya-bookstore", "connector", "golden-family", "golden-food"],
   parents: ["holiday-start", "boya-bookstore", "daka-coffee", "connector", "golden-rest", "golden-food"],
-  friends: ["holiday-start", "boya-bookstore", "daka-coffee", "connector", "golden-food"],
+  friends: ["boya-bookstore", "daka-coffee", "connector", "golden-food"],
   solo: ["boya-bookstore", "daka-coffee", "connector", "golden-shopping"],
   rain: ["boya-bookstore", "daka-coffee", "connector", "golden-shopping", "golden-food"]
 };

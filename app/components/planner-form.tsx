@@ -7,7 +7,7 @@ import Icon from "./ui-icon";
 const scenes = [["date", "heart", "约会"], ["friends", "users", "朋友"], ["family", "family", "家人"], ["solo", "coffee", "独处"]] as const;
 const examples = [
   { label: "陪爸妈慢逛", request: "陪爸妈逛两小时，想逛宜得利，不喝咖啡，尽量室内", scene: "family", duration: 120, budget: "100", walking: "low" },
-  { label: "朋友聚一聚", request: "和朋友逛书店、喝咖啡，再吃晚饭", scene: "friends", duration: 240, budget: "300", walking: "normal" },
+  { label: "朋友聚一聚", request: "和朋友逛书店、喝咖啡，再吃晚饭。", scene: "friends", duration: 240, budget: "300", walking: "low" },
   { label: "雨天遛娃", request: "带孩子在室内玩，安排亲子乐园，少走路", scene: "family", duration: 180, budget: "300", walking: "low" },
 ] as const;
 function homeScene(scene: Scene): Scene {

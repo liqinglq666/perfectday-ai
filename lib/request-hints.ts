@@ -12,7 +12,10 @@ const PLACE_MENTIONS: Array<[string, string[]]> = [
   ["泡泡玛特|盲盒", ["popmart"]],
   ["宜得利|家居|家装|生活方式店", ["nitori"]],
   ["盒马|超市|生鲜|买菜|伴手礼", ["hema"]],
-  ["吃饭|晚餐|晚饭|酸菜鱼|太二", ["golden-food"]]
+  ["酸菜鱼|太二", ["golden-food"]],
+  ["臻龙|臻龍", ["golden-zhenlong"]],
+  ["龙发|龍發", ["golden-longfa"]],
+  ["味千", ["holiday-ajisen"]]
 ];
 
 const CATEGORY_NEGATIONS: Array<[string, PlaceCategory]> = [
@@ -62,7 +65,21 @@ function isNegative(text: string, pattern: string) {
 }
 
 export function applyRequestHints(input: PlanInput): PlanInput {
-  if (input.intentSource === "bailian") return input;
+  // Generic dinner requests are a route role, not a mandate to visit every AI candidate.
+  // A named meal preference may cross malls; unnamed alternatives stay with local constraints.
+  if (input.intentSource === "bailian") {
+    const mealNames: Record<string, RegExp> = {
+      "golden-food": /太二|酸菜鱼/i,
+      "golden-zhenlong": /臻龙|臻龍/i,
+      "golden-longfa": /龙发|龍發/i,
+      "holiday-cafe-de-coral": /大家乐|大家樂|簡餐|简餐|快餐/i,
+      "holiday-ajisen": /味千/i
+    };
+    return { ...input, preferredPlaceIds: (input.preferredPlaceIds || []).filter(id => {
+      const place = places.find(item => item.id === id);
+      return place?.category !== "food" || mealNames[id]?.test(input.request);
+    }) };
+  }
   const text = input.request.trim();
   if (!text) return input;
 

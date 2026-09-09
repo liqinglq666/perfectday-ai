@@ -32,7 +32,7 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
     assert(guide.includes('1F · 2216'));
     assert(!guide.includes('试着处理一次途中变化'));
     assert(!guide.includes('非试用记录'));
-    let html = await page('/trip?scene=friends&duration=360&budget=300&walking=normal');
+    let html = await page('/trip?scene=date&duration=360&budget=300&walking=normal');
     assert(html.includes('本次为你考虑'));
     html = await page(anchor(html, '这一站逛完了'));
     html = await page(anchor(html, '这一站逛完了'));
@@ -58,6 +58,21 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
     const directState = JSON.parse(new URL(directSave.url).searchParams.get('journey'));
     assert.equal(directState.minutes, 30); assert.equal(directState.cash, 10);
     assert.equal(directState.pending.length, 0); assert.equal(directState.done.length, 2);
+    // Competition flow: completed book/coffee remain byte-for-byte intact after a named meal swap.
+    const mainQuery = new URLSearchParams({ request: '和朋友逛书店、喝咖啡，再吃晚饭。', scene: 'friends', duration: '240', budget: '300', walking: 'low', ai: 'fallback' });
+    let demo = await page('/trip?' + mainQuery);
+    demo = await page(anchor(demo, '这一站逛完了'));
+    demo = await page(anchor(demo, '这一站逛完了'));
+    const queueUrl = new URL(anchor(demo, '重排剩余行程'), origin);
+    const beforeQueue = JSON.parse(queueUrl.searchParams.get('journey'));
+    assert.equal(beforeQueue.done.map(s => s.id).join(','), 'boya-bookstore,daka-coffee');
+    assert.equal(beforeQueue.pending[0].id, 'holiday-cafe-de-coral');
+    queueUrl.searchParams.set('changes', 'queue'); queueUrl.searchParams.set('mode', 'save');
+    const queued = await navigate(queueUrl.href);
+    const afterQueue = JSON.parse(new URL(queued.url).searchParams.get('journey'));
+    assert.equal(JSON.stringify(afterQueue.done), JSON.stringify(beforeQueue.done));
+    assert.equal(afterQueue.current, 'holiday'); assert.equal(afterQueue.pending[0].id, 'holiday-ajisen');
+    assert((await queued.text()).includes('味千拉面'));
     const action = home.match(/name="(\$ACTION_ID_[^"]+)"/)[1];
     const body = new FormData(); body.set(action, ''); body.set('request', '一个人逛两小时，不喝咖啡，想逛宜得利'); body.set('scene', 'solo'); body.set('duration', '120'); body.set('budget', '100'); body.set('walking', 'low');
     const result = await navigate(origin, { method: 'POST', body, headers: { Origin: origin } });
