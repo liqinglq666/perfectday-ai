@@ -1,6 +1,10 @@
-# PerfectDay AI
+# PerfectDay AI｜双商圈随行助手
 
-一个移动端优先的商圈半日行程规划 PWA。首个 MVP 聚焦 **中山 · 完美金鹰 × 假日广场**，目标不是做复杂的“AI 展示项目”，而是让用户快速得到一条真的可以照着走的路线。
+**把出发前推荐，变成逛街途中持续决策。**
+
+Concept-to-Pilot 场景验证型 MVP，以 Journey Maintenance 为核心：AI理解需求，确定性系统维护正在发生的消费旅程。采用经公开资料核验的代表性商圈地点样本库。
+
+一个移动端优先的商圈半日行程规划 PWA。首个 MVP 聚焦 **中山 · 完美金鹰 × 假日广场**，目标不是做复杂的“AI 展示项目”，而是让用户快速得到一条可供用户执行和现场校正的路线。
 
 ## 百炼已接入，只需填写 Key
 
@@ -77,3 +81,7 @@ GitHub Actions 会对 `main` 与 Pull Request 自动执行同样的检查。
 消费、停留和步行均为估算，营业、票价、实时排队、车位与精确无障碍通道未接入。公开资料查阅时间不等于现场核验。地图链接使用高德关键词搜索。
 
 下一步可维护更多经过核对的地点与设施资料；授权商圈数据接入属于后续设想，不是已达成合作。
+
+## 最终参赛材料
+
+[比赛说明](docs/COMPETITION.md) · [80秒Demo](docs/DEMO_SCRIPT.md) · [正式讲稿](docs/PITCH_NARRATIVE.md) · [报名文案](docs/REGISTRATION_COPY.md) · [20问答辩](docs/DEFENSE_QA.md) · [来源](docs/EXTERNAL_SOURCES.md) · [QA报告](docs/FINAL_QA_REPORT.md) · [提交清单](docs/FINAL_SUBMISSION_CHECKLIST.md)

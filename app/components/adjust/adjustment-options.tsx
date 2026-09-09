@@ -5,7 +5,7 @@ const choices = [
   ["rain", "rain", "下雨了", "留在一个商场的室内"],
   ["walk", "walk", "想少走路", "优先留在当前商场"],
   ["budget", "wallet", "再省一点", "减少一项付费安排"],
-  ["queue", "queue", "餐厅排队", "改为现场自选餐厅"]
+  ["queue", "queue", "餐厅排队", "优先换同商场餐厅"]
 ] as const;
 
 type Props = {
