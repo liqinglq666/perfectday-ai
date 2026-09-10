@@ -12,7 +12,7 @@ Concept-to-Pilot 场景验证型 MVP，以 Journey Maintenance 为核心：AI理
 
 接口地址与 `qwen-plus` 已在代码中设为默认值，其余参数不用填。无需创建百炼应用或填写 App ID。完整操作与排错见 [`docs/BAILIAN_SETUP.md`](docs/BAILIAN_SETUP.md)。
 
-首页填写文字后点击“生成行程”，百炼解析自然语言、偏好与排除条件，现有规划器生成路线。未配置 Key 或调用失败仍可使用基础规划；行程页显示实际采用的模式。翻页和调整行程不会重复调用模型。
+首页填写文字后点击“生成行程”，百炼解析自然语言、偏好与排除条件，现有规划器生成路线。未配置 Key、调用失败或触发应用侧防刷限制时仍可使用本地解析/基础规划；行程页显示实际采用的模式。翻页和调整行程不会重复调用模型。应用侧限流只作轻量保护，公开演示前仍应在百炼账户侧设置可接受的额度上限。
 
 ## 当前版本：MVP v0.5 · 双商圈随行助手
 
@@ -34,7 +34,7 @@ Concept-to-Pilot 场景验证型 MVP，以 Journey Maintenance 为核心：AI理
 - Next.js 16 + React 19 + TypeScript
 - 纯 CSS 设计系统，减少依赖
 - 本地 TypeScript 地点数据，暂不依赖数据库
-- 百炼 Qwen 解析自然语言，本地规则与地点库生成路线；无 Key 或调用失败时使用关键词解析
+- 百炼 Qwen 解析自然语言，本地规则与地点库生成路线；无 Key、调用失败或短时防刷命中时使用本地解析/基础规划
 - 高德 URI 外部查看，暂不接复杂地图
 - Vercel 免费部署优先
 
@@ -48,7 +48,7 @@ Concept-to-Pilot 场景验证型 MVP，以 Journey Maintenance 为核心：AI理
 ## 本地运行
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -63,7 +63,7 @@ npm run build
 npm run test:flow
 ```
 
-GitHub Actions 会对 `main` 与 Pull Request 自动执行同样的检查。
+依赖树由 `package-lock.json` 冻结；GitHub Actions 使用 `npm ci`，并对 `main` 与 Pull Request 自动执行同样的检查。
 
 ## 产品原则
 
