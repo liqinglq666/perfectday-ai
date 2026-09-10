@@ -2,7 +2,6 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { generateTrip as _unused } from "@/app/actions";
 import { aiClientKey, consumeAiAllowance } from "@/lib/ai-rate-limit";
 import { interpretWithBailian } from "@/lib/bailian";
 import { parseInput, queryString } from "@/lib/planner";
