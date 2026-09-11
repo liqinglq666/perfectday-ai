@@ -1,0 +1,182 @@
+/* v2 illustration mapping: keep functional UI primary and use artwork as supportive context. */
+.home-hero picture,
+.home-hero img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.home-hero img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.guide-overview-visual {
+  margin: 24px 0 30px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: #fffdf8;
+  box-shadow: 0 12px 32px #283d200c;
+}
+.guide-overview-visual img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.guide-overview-visual figcaption {
+  padding: 10px 15px 12px;
+  border-top: 1px solid #edf0e8;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.mall-visual-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 28px 0 4px;
+}
+.mall-visual-grid article {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+}
+.mall-visual-grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.mall-visual-grid article > div {
+  padding: 20px 21px 22px;
+}
+.mall-visual-grid h2 {
+  margin: 7px 0 8px;
+  font-size: 20px;
+}
+.mall-visual-grid article > div > p:last-child {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.loading-illustration {
+  margin: 0;
+  overflow: hidden;
+  align-self: start;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fffdf8;
+}
+.loading-illustration img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.error-page {
+  max-width: 1000px;
+}
+.error-visual-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .9fr);
+  gap: 38px;
+  align-items: center;
+}
+.error-copy > p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.9;
+}
+.error-illustration {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: #fffdf8;
+}
+
+.journey-finish {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 28px;
+  align-items: center;
+}
+.journey-finish-copy > p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.journey-finish-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 1px solid #dce5d3;
+  background: #fffdf8;
+}
+
+@media (max-width: 760px) {
+  .guide-overview-visual {
+    margin: 18px 0 22px;
+    border-radius: 16px;
+  }
+  .guide-overview-visual figcaption {
+    padding: 8px 11px 10px;
+    font-size: 9px;
+  }
+  .mall-visual-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 13px;
+    margin-top: 19px;
+  }
+  .mall-visual-grid article {
+    border-radius: 15px;
+  }
+  .mall-visual-grid article > div {
+    padding: 17px 18px 19px;
+  }
+  .mall-visual-grid h2 {
+    font-size: 18px;
+  }
+  .mall-visual-grid article > div > p:last-child {
+    font-size: 11px;
+  }
+  .loading-illustration {
+    border-radius: 15px;
+  }
+  .error-visual-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+  .error-copy > p:not(.eyebrow) {
+    font-size: 13px;
+  }
+  .error-illustration {
+    max-height: 290px;
+    object-fit: cover;
+    border-radius: 16px;
+  }
+  .journey-finish {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .journey-finish-copy > p:not(.eyebrow) {
+    font-size: 13px;
+  }
+  .journey-finish-art {
+    max-height: 270px;
+    object-fit: cover;
+  }
+}
+
+@media (max-width: 370px) {
+  .journey-finish-art,
+  .error-illustration {
+    max-height: 235px;
+  }
+}
