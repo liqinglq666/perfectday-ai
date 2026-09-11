@@ -159,16 +159,29 @@ export function adjustPlan(rawInput: PlanInput, change: AdjustmentChange | Adjus
     stops = oneMall(stops, input.preferredPlaceIds, input.scene);
   }
   if (changes.has("queue")) {
-    stops = stops.map((stop) => stop.category === "food" ? {
-      ...stop,
-      name: "石岐万象汇 · 餐饮区现场备选",
-      searchKeyword: "中山石岐万象汇 餐饮",
-      price: Math.min(stop.price, 90),
-      status: "replaced" as const,
-      note: "在餐饮区现场比较排队情况，自选等待较短的门店；这里不代表实时推荐。",
-      sourceLabel: "商圈公共区域",
-      sourceUrl: "https://www.zsnews.cn/trade/index/view/cateid/45/id/698538.html"
-    } : stop);
+    stops = stops.map((stop) => {
+      if (stop.category !== "food") return stop;
+
+      const inHolidayPlaza = stop.mall === "假日广场";
+      const mallLabel = inHolidayPlaza ? "假日广场" : "石岐万象汇";
+      return {
+        ...stop,
+        name: `${mallLabel} · 餐饮区现场备选`,
+        floor: "餐饮区域 · 现场自选",
+        address: inHolidayPlaza
+          ? "中山市石岐街道兴中道6号假日广场"
+          : "中山市石岐区孙文东路28号中山石岐万象汇",
+        searchKeyword: `${mallLabel} 餐饮 中山`,
+        price: Math.min(stop.price, 90),
+        status: "replaced" as const,
+        note: "请在当前商场餐饮区现场比较菜单和等待情况；未接入实时排队，不保证有空位。",
+        sourceLabel: "商场公共区域",
+        sourceUrl: undefined,
+        evidenceNote: "这是当前商场内的现场自选安排，不是一家已核定的替代餐厅。",
+        evidenceStatus: "public_area" as const,
+        locationPrecision: "area" as const
+      };
+    });
   }
   if (changes.has("budget")) {
     const paid = [...stops]

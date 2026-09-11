@@ -55,6 +55,24 @@ test('reviewed Holiday Plaza alternatives avoid crossing only because the local 
   assert(dessertPlan.stops.every(stop => stop.mall === '假日广场'));
   checkRoute(dessertPlan, 120, 100);
 });
+test('legacy queue fallback stays in the meal stop mall and downgrades evidence to public-area guidance', () => {
+  const holiday = planner.adjustPlan({ ...base, walking: 'low' }, 'queue').stops.find(stop => stop.category === 'food');
+  assert(holiday);
+  assert.equal(holiday.mall, '假日广场');
+  assert.match(holiday.name, /^假日广场 · 餐饮区现场备选$/);
+  assert.equal(holiday.searchKeyword, '假日广场 餐饮 中山');
+  assert.equal(holiday.evidenceStatus, 'public_area');
+  assert.equal(holiday.locationPrecision, 'area');
+  assert.equal(holiday.sourceUrl, undefined);
+
+  const golden = planner.adjustPlan(base, 'queue').stops.find(stop => stop.category === 'food');
+  assert(golden);
+  assert.notEqual(golden.mall, '假日广场');
+  assert.match(golden.name, /^石岐万象汇 · 餐饮区现场备选$/);
+  assert.equal(golden.searchKeyword, '石岐万象汇 餐饮 中山');
+  assert.equal(golden.evidenceStatus, 'public_area');
+  assert.equal(golden.locationPrecision, 'area');
+});
 test('the three homepage quick demos keep clearly different route identities', () => {
   const parents = planner.createPlan(planner.parseInput({
     request: '陪爸妈逛两小时，想逛宜得利，不喝咖啡，尽量室内',
