@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import PlannerForm from "@/app/components/planner-form";
 import { RecentTripLink } from "@/app/components/trip-memory";
@@ -40,6 +41,37 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </section>
         <PlannerForm initial={input} key={JSON.stringify(input)}/>
       </div>
+
+      <section className="home-product-story" aria-labelledby="product-story-title">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">不是只生成一张清单</p>
+            <h2 id="product-story-title">先规划，再陪你把变化接住。</h2>
+          </div>
+        </div>
+        <div className="product-story-grid">
+          <article>
+            <Image
+              src="/images/scenes/plan.webp"
+              alt="PerfectDay AI 一键规划场景手绘示意"
+              width={1200}
+              height={900}
+              sizes="(max-width: 760px) 100vw, 50vw"
+            />
+            <div><span>01 / 出发前</span><h3>把需求变成一条能走的路线</h3><p>时间、预算、步行偏好和想去的地方一起考虑，地点来自本地样本库。</p></div>
+          </article>
+          <article>
+            <Image
+              src="/images/scenes/replan.webp"
+              alt="PerfectDay AI 途中调整与剩余行程重排手绘示意"
+              width={1200}
+              height={900}
+              sizes="(max-width: 760px) 100vw, 50vw"
+            />
+            <div><span>02 / 逛到一半</span><h3>计划有变，只重排还没去的</h3><p>下雨、走累、预算变化或餐厅排队时，已完成的记录不动，只调整剩余路线。</p></div>
+          </article>
+        </div>
+      </section>
 
       <div className="home-guide-link">
         <div>
