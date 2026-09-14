@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: "PerfectDay AI",
     short_name: "PerfectDay",
-    description: "一键生成你的双商圈完美半日",
+    description: "一键生成你的商圈完美半日",
     start_url: "/",
     scope: "/",
     lang: "zh-CN",
@@ -15,9 +15,8 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#244b3d",
     categories: ["lifestyle", "travel"],
     icons: [
-      { src: "/images/brand/app-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/images/brand/app-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/images/brand/maskable-icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }
+      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: "/maskable-icon.svg", sizes: "any", type: "image/svg+xml", purpose: "maskable" }
     ]
   };
 }
