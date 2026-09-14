@@ -16,6 +16,6 @@ export default function JourneyProgress({ journey, doneCount, leftCount, skipped
       <small>{skippedCount ? `已跳过 ${skippedCount} 站 · ` : ""}{leftCount ? `还有 ${leftCount} 站，慢慢来` : "本段已结束"}</small>
     </div>
     <span className="progress-location"><Icon name="pin" size={14}/>{mallName(journey.current)}</span>
-    <progress aria-label="行程完成进度" max={Math.max(1, total)} value={doneCount}/>
+    <progress aria-label="行程完成进度" max={Math.max(1, total)} value={doneCount + skippedCount}/>
   </div>;
 }
