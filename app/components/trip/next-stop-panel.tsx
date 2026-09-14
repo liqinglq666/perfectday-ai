@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import ActionLink from "@/app/components/action-link";
 import Icon from "@/app/components/ui-icon";
@@ -17,12 +18,17 @@ type Props = {
 
 export default function NextStopPanel({ next, input, journey, currentHref, adjustUrl, editUrl, doneCount }: Props) {
   if (!next) {
+    const stateImage = doneCount ? "/images/ui/states/state-success.webp" : "/images/ui/states/state-empty.webp";
+    const stateAlt = doneCount ? "行程完成后的轻松商圈拼贴插图" : "暂无后续行程时的留白路线拼贴插图";
     return <div className="journey-finish">
-      <span className="finish-symbol"><Icon name="sun" size={36}/></span>
-      <p className="eyebrow">今天的这一段</p>
-      <h2>{doneCount ? "这一段，告一段落。" : "先留一点自由时间。"}</h2>
-      <p>{doneCount ? `已经留下 ${doneCount} 站记录。` : "当前条件下没有可继续的地点。"}可以撤销刚才的操作，或重新安排一段行程。</p>
-      <Link href={editUrl} className="primary-button">规划新行程<Icon name="arrow" size={17}/></Link>
+      <div className="journey-finish-copy">
+        <span className="finish-symbol"><Icon name="sun" size={36}/></span>
+        <p className="eyebrow">今天的这一段</p>
+        <h2>{doneCount ? "这一段，告一段落。" : "先留一点自由时间。"}</h2>
+        <p>{doneCount ? `已经留下 ${doneCount} 站记录。` : "当前条件下没有可继续的地点。"}可以撤销刚才的操作，或重新安排一段行程。</p>
+        <Link href={editUrl} className="primary-button">规划新行程<Icon name="arrow" size={17}/></Link>
+      </div>
+      <div className="journey-finish-visual"><Image src={stateImage} alt={stateAlt} fill sizes="(max-width: 760px) calc(100vw - 80px), 260px"/></div>
     </div>;
   }
 
