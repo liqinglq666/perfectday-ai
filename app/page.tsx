@@ -12,14 +12,14 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   return <><Header/><main id="main-content" className="page home-page">
     <div className="planning-layout">
       <section className="home-intro" aria-labelledby="home-title">
-        <p className="eyebrow"><span/>中山 · 双商圈随行助手</p>
-        <h1 id="home-title">今天，<br className="desktop-break"/><em>慢慢逛。</em></h1>
-        <p className="intro-copy">喜欢的地方，刚好的节奏。<br/>出发前有安排，逛到一半也能轻松改变。</p><div className="home-benefits"><span><Icon name="pin" size={15}/>有来源的地点</span><span><Icon name="sliders" size={15}/>途中随时调整</span></div>
-        <div className="home-hero"><Image src="/images/city-afternoon.webp" alt="绿树与暖阳下的商圈步行街氛围示意" fill priority sizes="(max-width: 760px) 126px, 48vw"/><div className="hero-caption"><span><Icon name="pin" size={16}/>假日广场 × 完美金鹰</span><small>AI 氛围图</small></div></div>
+        <p className="eyebrow"><span/>完美金鹰·假日商圈 · 一体化随行助手</p>
+        <h1 id="home-title">商圈已打通<br className="desktop-break"/><em>体验也打通</em></h1>
+        <p className="intro-copy">商圈已经打通，PerfectDay AI 让体验也真正打通。<br/>把同行人、时间、预算和偏好接成一条刚好的路线；途中有变化，只调整还没发生的部分。</p><div className="home-benefits"><span><Icon name="pin" size={15}/>互补业态一起规划</span><span><Icon name="sliders" size={15}/>只重排未完成行程</span></div>
+        <div className="home-hero"><Image src="/images/city-afternoon.webp" alt="绿树与暖阳下的商圈步行街氛围示意" fill priority sizes="(max-width: 760px) 126px, 48vw"/><div className="hero-caption"><span><Icon name="pin" size={16}/>完美金鹰·假日商圈</span><small>一体化商圈体验示意</small></div></div>
       </section>
       <PlannerForm initial={input} key={JSON.stringify(input)}/>
     </div>
-    <div className="home-guide-link"><div><strong>围绕中山真实商圈，安排下一站</strong><p>公开地点资料、到店提示，还有可以直接体验的途中重排。</p></div><Link href="/guide" className="text-link">看看商圈指南<Icon name="arrow" size={17}/></Link></div>
-    <RecentTripLink/><InstallTip/><footer className="site-footer"><span>PerfectDay AI · 把半天过成喜欢的样子</span><small>图片为 AI 生成的氛围示意，非商户实拍。</small></footer>
+    <div className="home-guide-link"><div><strong>两个商圈，不再是两份攻略</strong><p>把书店、咖啡、餐饮、购物与亲子等互补内容接成一条能继续、能调整的商圈行程。</p></div><Link href="/guide" className="text-link">看看商圈指南<Icon name="arrow" size={17}/></Link></div>
+    <RecentTripLink/><InstallTip/><footer className="site-footer"><span>PerfectDay AI · 把物理连通变成体验连通</span><small>图片为 AI 生成的氛围示意，非商户实拍。</small></footer>
   </main></>;
 }

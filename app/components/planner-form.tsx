@@ -19,8 +19,8 @@ export default function PlannerForm({ initial }: { initial: PlanInput }) {
   const [example, setExample] = useState("");
   const durations = [...new Set([90, 120, 180, 240, 360, 480, initial.duration])].sort((a, b) => a - b);
   return <form action={generateTrip} className="planner-panel" id="planner">
-    <div className="panel-heading"><span className="mini-mark"><Icon name="sparkles"/></span><div><h2>今天，按你的节奏来</h2><p>选好时间和偏好，就可以出发。</p></div></div>
-    <div className="request-field"><label htmlFor="request">今天想怎么玩？<span>选填</span></label><textarea id="request" name="request" value={request} onChange={event => { setRequest(event.target.value); setExample(""); }} maxLength={600} rows={3} placeholder="比如：带爸妈逛两小时，想逛书店，不喝咖啡，少走路" aria-describedby="request-help"/><div className="request-help"><p id="request-help">也可以直接选下方偏好，文字描述优先。</p><small>{request.length}/600</small></div></div>
+    <div className="panel-heading"><span className="mini-mark"><Icon name="sparkles"/></span><div><h2>今天，想怎么逛这片商圈？</h2><p>说出同行人、时间、预算和偏好，先给你一条刚好的路线。</p></div></div>
+    <div className="request-field"><label htmlFor="request">今天想怎么安排？<span>选填</span></label><textarea id="request" name="request" value={request} onChange={event => { setRequest(event.target.value); setExample(""); }} maxLength={600} rows={3} placeholder="比如：带爸妈逛两小时，想逛书店，不喝咖啡，少走路" aria-describedby="request-help"/><div className="request-help"><p id="request-help">也可以直接选下方偏好，文字描述优先。</p><small>{request.length}/600</small></div></div>
     <div className="example-chips" aria-label="试填一种出行想法">{examples.map(item => <button key={item.label} type="button" aria-pressed={example === item.label} onClick={() => { setRequest(item.request); setScene(item.scene); setDuration(item.duration); setBudget(item.budget); setWalking(item.walking); setExample(item.label); }}><Icon name="sparkles" size={13}/>{item.label}</button>)}</div>
     <fieldset><legend><span className="step-number">01</span>和谁一起？</legend><div className="scene-grid">{scenes.map(([value, icon, label]) => <label className="scene-option" key={value}><input type="radio" name="scene" value={value} checked={scene === value} onChange={() => { setScene(value); setExample(""); }}/><span><Icon name={icon}/><strong>{label}</strong></span></label>)}</div></fieldset>
     <fieldset><legend><span className="step-number">02</span>留多少时间和预算？</legend><div className="preferences">
@@ -28,6 +28,6 @@ export default function PlannerForm({ initial }: { initial: PlanInput }) {
       <label><span><Icon name="wallet" size={16}/>人均预算</span><select name="budget" value={budget} onChange={event => setBudget(event.target.value as Budget)}><option value="100">¥100 内</option><option value="300">¥300 内</option><option value="500">¥500 内</option><option value="plus">¥800 内</option></select></label>
       <label><span><Icon name="walk" size={16}/>步行偏好</span><select name="walking" value={walking} onChange={event => setWalking(event.target.value as Walking)}><option value="low">少走一点</option><option value="normal">正常步行</option></select></label>
     </div></fieldset>
-    <SubmitButton/><div className="form-reassurance"><Icon name="check" size={14}/>途中可以改，不用一次想好所有安排</div>
+    <SubmitButton/><div className="form-reassurance"><Icon name="check" size={14}/>途中变了，只调整还没发生的部分</div>
   </form>;
 }

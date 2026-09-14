@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "PerfectDay AI",
-  description: "围绕中山假日广场与完美金鹰，规划半日行程、记录途中进度，随时调整剩余安排。",
+  description: "商圈已经打通，PerfectDay AI 让体验也真正打通：围绕中山完美金鹰·假日商圈规划行程，并在途中变化时只调整未完成部分。",
   applicationName: "PerfectDay AI",
   formatDetection: { telephone: false },
   appleWebApp: {
@@ -32,4 +32,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
-
