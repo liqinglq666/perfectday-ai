@@ -13,8 +13,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     <div className="planning-layout">
       <section className="home-intro" aria-labelledby="home-title">
         <p className="eyebrow"><span/>完美金鹰·假日商圈 · 一体化随行助手</p>
-        <h1 id="home-title">商圈已经打通，<br className="desktop-break"/><em>体验也真正打通。</em></h1>
-        <p className="intro-copy">告诉我同行人、时间、预算和偏好，把互补业态接成一条刚好的路线。<br/>下雨、走累、排队或时间变化时，只调整还没发生的部分。</p><div className="home-benefits"><span><Icon name="pin" size={15}/>互补业态一起规划</span><span><Icon name="sliders" size={15}/>只重排未完成行程</span></div>
+        <h1 id="home-title">商圈已打通<br className="desktop-break"/><em>体验也打通</em></h1>
+        <p className="intro-copy">商圈已经打通，PerfectDay AI 让体验也真正打通。<br/>把同行人、时间、预算和偏好接成一条刚好的路线；途中有变化，只调整还没发生的部分。</p><div className="home-benefits"><span><Icon name="pin" size={15}/>互补业态一起规划</span><span><Icon name="sliders" size={15}/>只重排未完成行程</span></div>
         <div className="home-hero"><Image src="/images/city-afternoon.webp" alt="绿树与暖阳下的商圈步行街氛围示意" fill priority sizes="(max-width: 760px) 126px, 48vw"/><div className="hero-caption"><span><Icon name="pin" size={16}/>完美金鹰·假日商圈</span><small>一体化商圈体验示意</small></div></div>
       </section>
       <PlannerForm initial={input} key={JSON.stringify(input)}/>
