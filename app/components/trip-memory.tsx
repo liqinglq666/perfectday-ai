@@ -1,14 +1,21 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "./ui-icon";
 import ActionLink from "./action-link";
 import { LAST_TRIP_KEY, UNDO_TRIP_KEY, readSavedTrip, readTripUndo, type SavedTrip, type TripUndo } from "@/lib/trip-storage";
 export function RememberTrip({ href, title, done, left }: Omit<SavedTrip, "v" | "savedAt">) {
   const [undo, setUndo] = useState<TripUndo | null>(null);
+  const consumedUndo = useRef(false);
   useEffect(() => {
     try { localStorage.setItem(LAST_TRIP_KEY, JSON.stringify({ v: 1, href, title, done, left, savedAt: Date.now() })); } catch { /* URL sharing still works. */ }
-    try { setUndo(readTripUndo(sessionStorage.getItem(UNDO_TRIP_KEY), href)); } catch { setUndo(null); }
+    if (consumedUndo.current) return;
+    consumedUndo.current = true;
+    try {
+      const nextUndo = readTripUndo(sessionStorage.getItem(UNDO_TRIP_KEY), href);
+      setUndo(nextUndo);
+      if (nextUndo) sessionStorage.removeItem(UNDO_TRIP_KEY);
+    } catch { setUndo(null); }
   }, [href, title, done, left]);
   return undo ? <div className="undo-notice" role="status"><span><Icon name="check" size={16}/>{undo.label === "跳过这一站" ? "已跳过这一站" : undo.label === "不换商场了" ? "已保留当前商场的安排" : "已更新行程"}</span><ActionLink href={undo.from} label="撤销上一步" className="text-link">撤销上一步<Icon name="back" size={15}/></ActionLink></div> : null;
 }

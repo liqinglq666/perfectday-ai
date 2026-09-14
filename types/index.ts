@@ -34,7 +34,6 @@ export interface Place {
   note: string;
   icon: string;
   accent: string;
-  visual: string;
   evidenceStatus: EvidenceStatus;
   locationPrecision: LocationPrecision;
   searchKeyword?: string;
