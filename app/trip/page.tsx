@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Header from "@/app/components/header";
 import Icon from "@/app/components/ui-icon";
-import { RememberTrip } from "@/app/components/trip-memory";
+import { RememberTrip } from "@/app/components/trip/trip-memory";
 import JourneyProgress from "@/app/components/trip/journey-progress";
 import NextStopPanel from "@/app/components/trip/next-stop-panel";
 import TripHistory from "@/app/components/trip/trip-history";
