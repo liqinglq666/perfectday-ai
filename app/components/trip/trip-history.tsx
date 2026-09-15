@@ -33,6 +33,6 @@ export default function TripHistory({ journey, remainingPlan, editUrl, doneCount
       <summary>已跳过 {journey.skipped.length} 项</summary>
       <ul>{journey.skipped.map(id => <li key={id}>{resolveStop({ id }).name}</li>)}</ul>
     </details>}
-    <p className="photo-note">时间与消费均为估算，营业与通行以现场为准。图片为 AI 氛围示意，非门店实拍。</p>
+    <p className="photo-note">时间、消费与步行均为规划估算，营业、排队与实际通行情况以现场为准。</p>
   </section>;
 }
