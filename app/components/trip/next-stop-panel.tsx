@@ -1,8 +1,8 @@
 import Link from "next/link";
 import ActionLink from "@/app/components/action-link";
 import Icon from "@/app/components/ui-icon";
-import { amapUrl } from "@/app/components/trip-ui";
 import { advanceJourney, journeyUrl, type Journey } from "@/lib/journey";
+import { amapUrl } from "@/lib/maps";
 import type { PlanInput, TripStop } from "@/types";
 
 type Props = {
@@ -24,9 +24,6 @@ export default function NextStopPanel({ next, input, journey, currentHref, adjus
         <h2>{doneCount ? "这一段，告一段落。" : "先留一点自由时间。"}</h2>
         <p>{doneCount ? `已经留下 ${doneCount} 站记录。` : "当前条件下没有可继续的地点。"}可以撤销刚才的操作，或重新安排一段行程。</p>
         <Link href={editUrl} className="primary-button">规划新行程<Icon name="arrow" size={17}/></Link>
-      </div>
-      <div className="journey-finish-visual" aria-hidden="true">
-        <span className="finish-symbol"><Icon name={doneCount ? "check" : "sun"} size={52}/></span>
       </div>
     </div>;
   }
