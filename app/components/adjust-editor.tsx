@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type FormEvent } from "react";
@@ -102,10 +103,15 @@ export default function AdjustEditor({ input, original, initial, initialChanges 
       <span className="quiet-label">途中调整</span>
     </div>
 
-    <header className="adjust-heading">
-      <p className="eyebrow">把下一段，安排得刚刚好</p>
-      <h1>计划有变，也没关系。</h1>
-      <p>已完成的 {doneCount} 站会保留，只调整还没去的地方。</p>
+    <header className="adjust-heading adjust-heading-with-visual">
+      <div className="adjust-heading-copy">
+        <p className="eyebrow">把下一段，安排得刚刚好</p>
+        <h1>计划有变，也没关系。</h1>
+        <p>已完成的 {doneCount} 站会保留，只调整还没去的地方。</p>
+      </div>
+      <div className="adjust-heading-visual" aria-hidden="true">
+        <Image src="/images/ui/replan/perfectday-replan-banner.png" alt="" fill priority sizes="(max-width: 760px) calc(100vw - 36px), 420px"/>
+      </div>
     </header>
 
     <div className="adjust-layout">
