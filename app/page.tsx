@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import PlannerForm from "@/app/components/planner-form";
-import { RecentTripLink } from "@/app/components/trip-memory";
 import Header from "@/app/components/header";
 import Icon from "@/app/components/ui-icon";
-import InstallTip from "@/app/components/install-tip";
+import InstallTip from "@/app/components/home/install-tip";
+import PlannerForm from "@/app/components/home/planner-form";
+import { RecentTripLink } from "@/app/components/trip/trip-memory";
 import { parseInput } from "@/lib/planner";
 
 export const maxDuration = 30;
