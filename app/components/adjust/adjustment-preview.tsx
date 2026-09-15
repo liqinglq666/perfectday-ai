@@ -1,6 +1,6 @@
 import type { RefObject } from "react";
 import Icon from "@/app/components/ui-icon";
-import { formatMinutes } from "@/app/components/trip-ui";
+import { formatMinutes } from "@/lib/format";
 import type { Journey } from "@/lib/journey";
 import type { TripPlan } from "@/types";
 
