@@ -1,7 +1,11 @@
 /* Live adjustment with one clear save action. */
 .adjust-heading { margin: 8px 0 31px; }
 .adjust-heading h1 { margin: 9px 0 12px; font-size: 35px; }
-.adjust-heading>p:last-child { color: var(--muted); font-size: 14px; }
+.adjust-heading>p:last-child, .adjust-heading-copy>p:last-child { color: var(--muted); font-size: 14px; }
+.adjust-heading-with-visual { display: grid; grid-template-columns: minmax(0,.95fr) minmax(300px,.75fr); gap: 28px; align-items: stretch; }
+.adjust-heading-copy { align-self: center; }
+.adjust-heading-visual { position: relative; min-height: 190px; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: #f4f0e6; }
+.adjust-heading-visual img { object-fit: cover; object-position: center; }
 .adjust-layout { display: grid; grid-template-columns: minmax(0,.95fr) minmax(0,1.05fr); gap: 34px; align-items: start; }
 .adjust-options { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
 .remaining-form .section-heading { gap: 8px; }
@@ -61,3 +65,7 @@
 .empty-state h3 { margin: 12px 0 9px; font-size: 18px; }
 .empty-state p { font-size: 13px; color: var(--muted); line-height: 1.9; }
 .empty-state a, .empty-state button { margin-top: 18px; }
+@media (max-width: 760px) {
+  .adjust-heading-with-visual { grid-template-columns: 1fr; gap: 18px; }
+  .adjust-heading-visual { min-height: 180px; }
+}
