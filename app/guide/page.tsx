@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@/app/components/header";
-import PlaceDirectory from "@/app/components/place-directory";
+import PlaceDirectory from "@/app/components/guide/place-directory";
 import Icon from "@/app/components/ui-icon";
 import { places } from "@/data/places";
 
