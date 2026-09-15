@@ -1,5 +1,5 @@
 import Icon from "@/app/components/ui-icon";
-import { Timeline } from "@/app/components/trip-ui";
+import Timeline from "@/app/components/trip/timeline";
 import { clockText, resolveStop, type Journey } from "@/lib/journey";
 import type { TripPlan } from "@/types";
 

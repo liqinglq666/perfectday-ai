@@ -1,7 +1,8 @@
 import Link from "next/link";
-import ShareTrip from "@/app/components/share-trip";
 import Icon from "@/app/components/ui-icon";
-import { Metrics, formatMinutes } from "@/app/components/trip-ui";
+import Metrics from "@/app/components/trip/metrics";
+import ShareTrip from "@/app/components/trip/share-trip";
+import { formatMinutes } from "@/lib/format";
 import { clockText, type Journey } from "@/lib/journey";
 import type { PlanInput, TripPlan } from "@/types";
 
