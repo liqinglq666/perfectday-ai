@@ -3,7 +3,17 @@ const assert = require('node:assert/strict');
 const { createTsLoader } = require('./helpers/load-ts.cjs');
 
 const load = createTsLoader();
-const { consumeAiAllowance, AI_RATE_LIMITS } = load('lib/ai-rate-limit');
+const { aiClientKey, consumeAiAllowance, AI_RATE_LIMITS } = load('lib/ai-rate-limit');
+
+test('changing User-Agent cannot grant a fresh IP allowance', () => {
+  const ip = '192.0.2.42';
+  for (let index = 0; index < AI_RATE_LIMITS.perMinute; index++) {
+    assert(consumeAiAllowance(aiClientKey(ip, `browser-${index}`), 1_000_000));
+  }
+  assert.equal(consumeAiAllowance(aiClientKey(ip, 'another-browser'), 1_000_000), false);
+  assert.equal(aiClientKey(ip), aiClientKey(` ${ip} `));
+  assert.notEqual(aiClientKey(ip), aiClientKey('192.0.2.43'));
+});
 
 test('AI limiter allows normal use and blocks bursts', () => {
   const key = `burst-${Date.now()}`;

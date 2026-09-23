@@ -18,6 +18,13 @@ export const BUDGET_CAP: Record<Budget, number> = {
   plus: 800
 };
 
+export function budgetCap(input: PlanInput) {
+  const limit = input.budgetLimit;
+  return typeof limit === "number" && Number.isFinite(limit) && limit >= 0
+    ? Math.min(BUDGET_CAP[input.budget], Math.floor(limit))
+    : BUDGET_CAP[input.budget];
+}
+
 export const PLAN_TEMPLATES: Record<Scene, string[]> = {
   date: ["holiday-start", "boya-bookstore", "daka-coffee", "connector", "golden-food"],
   family: ["holiday-start", "boya-bookstore", "connector", "golden-family", "golden-food"],

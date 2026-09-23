@@ -2,7 +2,8 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { aiClientKey, consumeAiAllowance } from "@/lib/ai-rate-limit";
+import { aiClientKey } from "@/lib/ai-rate-limit";
+import { checkAiAllowance } from "@/lib/ai-shared-rate-limit";
 import { interpretWithBailian } from "@/lib/bailian";
 import { parseInput, queryString } from "@/lib/planner";
 
@@ -20,9 +21,9 @@ export async function generateTrip(formData: FormData) {
     const requestHeaders = await headers();
     const forwardedFor = requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim();
     const ip = forwardedFor || requestHeaders.get("x-real-ip")?.trim() || "unknown";
-    const key = aiClientKey(ip, requestHeaders.get("user-agent") || "unknown");
+    const key = aiClientKey(ip);
 
-    if (!consumeAiAllowance(key)) {
+    if (!await checkAiAllowance(key)) {
       const fallback = { ...parseInput(fields, true), intentSource: "fallback" as const };
       redirect(`/trip?${queryString(fallback)}`);
     }

@@ -11,6 +11,8 @@ export interface Journey {
   pending: StopRef[];
   done: Visit[];
   skipped: string[];
+  /** Known meal IDs declined for queues. Optional for compatibility with v1 links. */
+  unavailableMeals?: string[];
   clock: number;
   minutes: number;
   cash: number;

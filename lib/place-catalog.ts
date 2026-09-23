@@ -1,5 +1,5 @@
 import { places } from "@/data/places";
-import type { Place } from "@/types";
+import type { Place, PlaceCategory } from "@/types";
 
 export type MallKey = "holiday" | "golden";
 
@@ -19,6 +19,11 @@ export function requirePlace(id: string): Place {
 
 export function hasPlace(id: string) {
   return placeCatalog.has(id);
+}
+
+/** Coffee and dessert fill the same break slot, but remain distinct exclusion categories. */
+export function sameCategoryRole(a: PlaceCategory, b: PlaceCategory) {
+  return a === b || (["coffee", "dessert"].includes(a) && ["coffee", "dessert"].includes(b));
 }
 
 export function mallKey(place: Place): MallKey {

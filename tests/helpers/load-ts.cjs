@@ -16,11 +16,13 @@ function createTsLoader({ root = defaultRoot, globals = {}, requireOverrides = {
     const moduleName = stripExtension(name.replace(/^@\//, ''));
     if (modules.has(moduleName)) return modules.get(moduleName);
 
-    const filename = path.join(root, moduleName + '.ts');
+    const tsFile = path.join(root, moduleName + '.ts');
+    const filename = fs.existsSync(tsFile) ? tsFile : path.join(root, moduleName + '.tsx');
     const compiled = ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
       compilerOptions: {
         module: ts.ModuleKind.CommonJS,
-        target: ts.ScriptTarget.ES2022
+        target: ts.ScriptTarget.ES2022,
+        jsx: ts.JsxEmit.ReactJSX
       }
     }).outputText;
     const exports = {};

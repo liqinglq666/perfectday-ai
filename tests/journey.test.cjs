@@ -196,3 +196,37 @@ test('same-mall replacement never resurrects a completed stop and queue can cont
   assert.equal(food.id, 'holiday-ajisen');
   assertFits(result.journey);
 });
+
+test('repeated queue changes never return to declined meals and persist through shared links', () => {
+  let state = stateWith(['holiday-cafe-de-coral'], { current: 'holiday', minutes: 240, cash: 300 });
+  state = j.replanRemaining(base, state, ['queue']).journey;
+  assert.equal(state.pending[0].id, 'holiday-ajisen');
+  assert.equal(state.unavailableMeals.join(','), 'holiday-cafe-de-coral');
+  state = j.decodeJourney(JSON.stringify(state));
+  state = j.replanRemaining(base, state, ['queue']).journey;
+  assert.equal(state.pending[0].q, 1, 'exhaustion becomes honest area guidance, not another known queued restaurant');
+  assert.equal(state.unavailableMeals.join(','), 'holiday-cafe-de-coral,holiday-ajisen');
+  const area = JSON.stringify(state);
+  assert.equal(JSON.stringify(j.replanRemaining(base, state, ['queue']).journey), area);
+  assertFits(state);
+
+  let golden = stateWith(['golden-food'], { current: 'golden', minutes: 240, cash: 300 });
+  const visited = [];
+  while (!golden.pending[0].q && visited.length < 10) {
+    visited.push(golden.pending[0].id);
+    golden = j.replanRemaining(base, golden, ['queue']).journey;
+    golden = j.decodeJourney(JSON.stringify(golden));
+    assert(golden);
+  }
+  assert.equal(new Set(visited).size, visited.length);
+  assert.equal(visited.join(','), 'golden-food,golden-zhenlong,golden-longfa');
+  assert.equal(golden.pending[0].q, 1);
+});
+
+test('queue history validation rejects non-meal IDs, duplicates and oversized payloads; old links remain valid', () => {
+  const state = j.startJourney(base);
+  assert(j.decodeJourney(JSON.stringify(state)));
+  for (const unavailableMeals of [null, 'golden-food', ['nitori'], ['unknown'], ['golden-food', 'golden-food'], Array(30).fill('golden-food')]) {
+    assert.equal(j.decodeJourney(JSON.stringify({ ...state, unavailableMeals })), null);
+  }
+});

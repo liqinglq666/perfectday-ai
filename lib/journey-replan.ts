@@ -1,4 +1,4 @@
-import { allPlaces, mallKey, requirePlace } from "@/lib/place-catalog";
+import { allPlaces, mallKey, requirePlace, sameCategoryRole } from "@/lib/place-catalog";
 import {
   mallName,
   resolveStop,
@@ -8,7 +8,7 @@ import {
 } from "@/lib/journey-core";
 import type { AdjustmentChange, PlanInput, Place } from "@/types";
 
-const replaceableCategories = new Set<Place["category"]>(["coffee", "food", "shopping"]);
+const replaceableCategories = new Set<Place["category"]>(["coffee", "dessert", "food", "shopping"]);
 const queueOnlyMealIds = new Set(["golden-zhenlong", "golden-longfa", "holiday-ajisen"]);
 const evidenceRank = { online_listing: 2, published_reference: 1, public_area: 0 } as const;
 const precisionRank = { exact: 2, mall: 1, area: 0 } as const;
@@ -35,7 +35,7 @@ function bestSameMallAlternative(source: Place, chosen: Mall, input: PlanInput, 
   return allPlaces
     .filter(place =>
       mallKey(place) === chosen &&
-      place.category === source.category &&
+      sameCategoryRole(place.category, source.category) &&
       !queueOnlyMealIds.has(place.id) &&
       !unavailable.has(place.id) &&
       !input.excludedPlaceIds?.includes(place.id) &&
@@ -80,6 +80,7 @@ function replaceWithSameMall(
   const unavailable = new Set<string>([
     ...journey.done.map(ref => ref.id),
     ...journey.skipped,
+    ...(journey.unavailableMeals || []),
     ...(input.excludedPlaceIds || [])
   ]);
   const localCategories = new Set(items
@@ -89,7 +90,7 @@ function replaceWithSameMall(
   return items.map(ref => {
     if (ref.id === "connector") return ref;
     const source = resolveStop(ref);
-    if (mallKey(source) === chosen || localCategories.has(source.category)) return ref;
+    if (mallKey(source) === chosen || [...localCategories].some(category => sameCategoryRole(category, source.category))) return ref;
 
     const alternative = bestSameMallAlternative(source, chosen, input, unavailable);
     if (!alternative) return ref;
@@ -104,6 +105,7 @@ function replaceWithSameMall(
 export function replanRemaining(input: PlanInput, journey: Journey, changes: AdjustmentChange[] = []) {
   const flags = new Set(changes);
   const removed = new Map<string, string>();
+  const unavailableMeals = new Set(journey.unavailableMeals || []);
   const crossed = journey.done.some(ref => ref.id === "connector") || journey.skipped.includes("connector");
   let items = [...journey.pending];
 
@@ -134,20 +136,24 @@ export function replanRemaining(input: PlanInput, journey: Journey, changes: Adj
   }
 
   if (flags.has("queue")) {
+    // Remember all named meals declined in this adjustment before finding any
+    // replacement, so neither another slot nor a later save can reselect them.
+    for (const ref of items) {
+      if (!ref.q && resolveStop(ref).category === "food") unavailableMeals.add(ref.id);
+    }
     const unavailable = new Set<string>([
       ...journey.done.map(ref => ref.id),
       ...journey.skipped,
+      ...unavailableMeals,
       ...(input.excludedPlaceIds || []),
       ...items.map(ref => ref.id)
     ]);
 
     items = items.map(ref => {
       const source = resolveStop(ref);
-      if (source.category !== "food") return ref;
+      if (source.category !== "food" || ref.q) return ref;
 
-      unavailable.delete(ref.id);
       const alternative = bestQueueAlternative(source, input, unavailable);
-      unavailable.add(ref.id);
 
       if (!alternative) return { id: ref.id, q: 1 };
 
@@ -202,7 +208,7 @@ export function replanRemaining(input: PlanInput, journey: Journey, changes: Adj
   }
 
   return {
-    journey: { ...journey, pending: items },
+    journey: { ...journey, pending: items, ...(unavailableMeals.size ? { unavailableMeals: [...unavailableMeals] } : {}) },
     removed: [...removed].map(([id, reason]) => ({ id, name: requirePlace(id).name, reason }))
   };
 }

@@ -26,9 +26,9 @@ export const AI_RATE_LIMITS = {
   perHour: MAX_PER_HOUR
 } as const;
 
-export function aiClientKey(ip: string, userAgent: string) {
+export function aiClientKey(ip: string) {
   return createHash("sha256")
-    .update(`${ip.slice(0, 128)}\n${userAgent.slice(0, 256)}`)
+    .update(ip.trim().toLowerCase().slice(0, 128) || "unknown")
     .digest("hex")
     .slice(0, 24);
 }

@@ -1,12 +1,14 @@
 import { adjustPlan, createPlan, parseChanges, queryString } from "@/lib/planner";
-import { BUDGET_CAP } from "@/lib/plan-config";
+import { budgetCap } from "@/lib/plan-config";
+import { applyRequestHints } from "@/lib/request-hints";
 import { placeCatalog, placeCount } from "@/lib/place-catalog";
 import { stopRef, type Journey, type StopRef, type Visit } from "@/lib/journey-core";
 import type { AdjustmentChange, PlanInput } from "@/types";
 
 export type JourneyParams = Record<string, string | string[] | undefined>;
 
-export function startJourney(input: PlanInput, changes: AdjustmentChange[] = []): Journey {
+export function startJourney(rawInput: PlanInput, changes: AdjustmentChange[] = []): Journey {
+  const input = applyRequestHints(rawInput);
   const plan = changes.length ? adjustPlan(input, changes) : createPlan(input);
   return {
     v: 1,
@@ -15,7 +17,7 @@ export function startJourney(input: PlanInput, changes: AdjustmentChange[] = [])
     skipped: [],
     clock: 840,
     minutes: input.duration,
-    cash: BUDGET_CAP[input.budget],
+    cash: budgetCap(input),
     current: ""
   };
 }
@@ -48,6 +50,11 @@ export function decodeJourney(raw: unknown): Journey | null {
         validInt(ref.p, 10000) && validInt(ref.w, 120)) ||
       !value.skipped.every((id: unknown) => typeof id === "string" && placeCatalog.has(id))) return null;
 
+    if (value.unavailableMeals !== undefined && (!Array.isArray(value.unavailableMeals) ||
+      value.unavailableMeals.length > placeCount ||
+      !value.unavailableMeals.every((id: unknown) => typeof id === "string" && placeCatalog.get(id)?.category === "food") ||
+      new Set(value.unavailableMeals).size !== value.unavailableMeals.length)) return null;
+
     const all = [
       ...value.pending.map((ref: StopRef) => ref.id),
       ...value.done.map((ref: StopRef) => ref.id),
@@ -63,7 +70,8 @@ export function decodeJourney(raw: unknown): Journey | null {
       clock: value.clock,
       minutes: value.minutes,
       cash: value.cash,
-      current: value.current
+      current: value.current,
+      ...(value.unavailableMeals?.length ? { unavailableMeals: [...value.unavailableMeals] } : {})
     };
   } catch {
     return null;
