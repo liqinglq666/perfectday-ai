@@ -10,7 +10,8 @@ const { places } = load('data/places');
 test('explicit budget is preserved through planning, sharing and completion', () => {
   for (const ai of ['', 'fallback', 'bailian']) {
     for (const amount of [0, 9, 20, 50, 150, 299]) {
-      const input = planner.parseInput({ request: `预算${amount}元，和朋友逛半天`, ai, walking: 'low' });
+      const input = planner.parseInput({ request: `预算${amount}元，和朋友逛半天`, ai, walking: 'low',
+        ...(ai === 'bailian' ? { cap: String(amount), budget: amount <= 100 ? '100' : '300' } : {}) });
       assert.equal(budgetCap(input), amount);
       const plan = planner.createPlan(input);
       assert(plan.totalPrice <= amount, `route exceeds ${amount}`);
@@ -35,7 +36,7 @@ test('minute, Chinese numeral and mixed-unit durations survive links without rou
     ['一个半小时', 90], ['两小时半', 150], ['半小时', 30], ['只有45分钟', 45], ['一小时', 60]];
   for (const [request, duration] of examples) {
     for (const ai of ['', 'fallback', 'bailian']) {
-      const input = planner.parseInput({ request, ai });
+      const input = planner.parseInput({ request, ai, ...(ai === 'bailian' ? { duration: String(duration) } : {}) });
       assert.equal(input.duration, duration, request);
       assert(planner.createPlan(input).totalMinutes <= duration);
       assert.equal(journey.startJourney(input).minutes, duration);
@@ -47,7 +48,8 @@ test('minute, Chinese numeral and mixed-unit durations survive links without rou
 
 test('rain preserves family and parents scene while enforcing indoor routes', () => {
   for (const ai of ['', 'fallback', 'bailian']) {
-    const input = planner.parseInput({ request: '雨天带孩子去亲子乐园，逛三小时', ai, scene: 'rain' });
+    const input = planner.parseInput({ request: '雨天带孩子去亲子乐园，逛三小时', ai, scene: 'rain',
+      ...(ai === 'bailian' ? { scene: 'family', indoor: '1', duration: '180', preferred: 'golden-family' } : {}) });
     assert.equal(input.scene, 'family');
     assert.equal(input.indoorOnly, true);
     const plan = planner.createPlan(input);

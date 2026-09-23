@@ -1,9 +1,11 @@
 const { spawn } = require('node:child_process');
 const assert = require('node:assert/strict');
+const { createTsLoader } = require('../tests/helpers/load-ts.cjs');
+const { places } = createTsLoader()('data/places');
 const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', '3017'], { cwd: process.cwd(), env: { ...process.env, DASHSCOPE_API_KEY: '' }, stdio: ['ignore', 'pipe', 'pipe'] });
 const origin = 'http://127.0.0.1:3017';
 const ready = new Promise((resolve, reject) => { server.stdout.on('data', chunk => { if (chunk.toString().includes('Ready')) resolve(); }); server.on('exit', code => reject(new Error('server exited ' + code))); });
-const timeout = setTimeout(() => server.kill(), 25000);
+const timeout = setTimeout(() => server.kill(), 45000);
 const anchor = (html, phrase) => {
   for (const match of html.matchAll(/<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/g)) if (match[2].includes(phrase)) return match[1].replace(/&amp;/g, '&');
   throw new Error('Missing link: ' + phrase);
@@ -99,6 +101,41 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
     const constrainedUrl = new URL(anchor(constrainedPage, '重排剩余行程'), origin);
     const constrainedState = JSON.parse(constrainedUrl.searchParams.get('journey'));
     assert.equal(constrainedState.cash, 50); assert.equal(constrainedState.minutes, 90);
-    console.log('PASS: server-rendered home, guide, completion, adjustment, save/reload, finish, no-key action, exact budget/minute limits, and persistent queue exhaustion.');
+    const compoundCases = [
+      { request: '今天逛90分钟，来回坐车需要两小时', minutes: 90, cash: 500 },
+      { request: '来回坐车需要两小时，今天逛90分钟', minutes: 90, cash: 500 },
+      { request: '预算不限，逛两小时', minutes: 120, cash: 500 },
+      { request: '预算没想好，逛90分钟', minutes: 90, cash: 500 },
+      { request: '只逛万象汇，预算50元，逛两小时', minutes: 120, cash: 50, mall: 'golden' },
+      { request: '只逛万象汇，只有60分钟', minutes: 60, cash: 500, mall: 'golden' },
+      { request: '今天不会下雨，想逛书店和宜得利', minutes: 240, cash: 500, ids: ['boya-bookstore', 'nitori'] },
+      { request: '想喝咖啡，也想吃糖水，逛四小时', minutes: 240, cash: 500, ids: ['daka-coffee', 'holiday-dessert'] }
+    ];
+    for (const example of compoundCases) {
+      body.set('request', example.request); body.set('walking', 'normal');
+      const response = await navigate(origin, { method: 'POST', body, headers: { Origin: origin } });
+      assert.equal(response.status, 200);
+      const rendered = await response.text();
+      const shared = new URL(anchor(rendered, '重排剩余行程'), origin);
+      const snapshot = JSON.parse(shared.searchParams.get('journey'));
+      assert.equal(snapshot.minutes, example.minutes, example.request);
+      assert.equal(snapshot.cash, example.cash, example.request);
+      assert(snapshot.pending.length > 0, example.request);
+      const stops = snapshot.pending.map(ref => places.find(place => place.id === ref.id));
+      assert(stops.reduce((total, stop) => total + stop.duration + stop.walkMinutes, 0) <= snapshot.minutes);
+      assert(stops.reduce((total, stop) => total + stop.price, 0) <= snapshot.cash);
+      if (example.mall) assert(stops.every(stop => stop.mall !== '假日广场' && stop.category !== 'connector'));
+      for (const id of example.ids || []) assert(stops.some(stop => stop.id === id), example.request);
+      shared.pathname = '/trip';
+      const reloaded = await page(shared.href);
+      const restored = JSON.parse(new URL(anchor(reloaded, '重排剩余行程'), origin).searchParams.get('journey'));
+      assert.equal(JSON.stringify(restored), JSON.stringify(snapshot));
+    }
+    // The provider decoder is mocked in unit tests; exercise its resolved URL in real rendering here.
+    const noodles = await page('/trip?' + new URLSearchParams({ request: '我想吃面条', scene: 'friends', duration: '240', budget: '300', walking: 'low', ai: 'bailian', meal: 'specific', preferred: 'holiday-ajisen' }));
+    const noodlesState = JSON.parse(new URL(anchor(noodles, '重排剩余行程'), origin).searchParams.get('journey'));
+    assert(noodlesState.pending.some(stop => stop.id === 'holiday-ajisen'));
+    assert(noodles.includes('味千拉面'));
+    console.log('PASS: server-rendered home, guide, completion, adjustment, save/reload, finish, no-key action, compound duration/budget/weather/meal requests, post-limit refill, and persistent queue exhaustion.');
   } finally { clearTimeout(timeout); server.kill(); }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

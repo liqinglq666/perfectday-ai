@@ -148,14 +148,18 @@ flowchart TB
   "scene": "friends",
   "duration": 240,
   "budget": "300",
+  "budgetLimit": null,
   "walking": "low",
   "preferredPlaceIds": ["boya-bookstore"],
   "excludedPlaceIds": ["daka-coffee"],
-  "indoorOnly": false
+  "indoorOnly": false,
+  "mealIntent": "none"
 }
 ```
 
 进入 Planner 之前，地点 ID、场景、时长、预算和字段类型都会被校验。模型超时、调用失败、格式异常、未配置 Key 或触发应用侧限制时，会回退到本地规则解析。
+
+校验通过的 AI 结果不再被本地关键词或数字正则重新覆盖。`budgetLimit` 保留明确的预算金额（未指定时为 `null`）；`mealIntent` 区分未提正餐、泛称吃饭与明确餐厅/食物偏好。泛称吃饭由路线模板安排一餐，“想吃面条”等具体需求保留模型选出的餐厅。已知闭店修正、排除地点、预算、时间和室内约束仍由本地规划器执行。新响应缺少必填语义字段时回退本地；旧分享链接仍可读取。
 
 **因此：AI 提升理解能力，但不成为系统唯一的运行依赖。**
 

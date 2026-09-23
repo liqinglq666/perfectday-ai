@@ -139,7 +139,7 @@ test('main demo keeps one local dinner despite over-broad model meal candidates'
   const { startJourney, advanceJourney, replanRemaining } = load('lib/journey');
   for (const intentSource of ['bailian', 'fallback']) {
     const input = planner.parseInput({ request: '和朋友逛书店、喝咖啡，再吃晚饭。', scene: 'friends', duration: '240', budget: '300', walking: 'low', ai: intentSource,
-      preferred: 'boya-bookstore,daka-coffee,golden-food,golden-zhenlong,golden-longfa' });
+      preferred: 'boya-bookstore,daka-coffee,golden-food,golden-zhenlong,golden-longfa', meal: 'generic' });
     const plan = planner.createPlan(input);
     assert.equal(plan.stops.map(s => s.id).join(','), 'boya-bookstore,daka-coffee,holiday-cafe-de-coral');
     let state = startJourney(input);
