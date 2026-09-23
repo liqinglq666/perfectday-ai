@@ -1,0 +1,29 @@
+name: UI review
+
+on:
+  push:
+    branches: [design/ui-ux-refresh]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package tracked source for review
+        run: git archive --format=zip HEAD -o /tmp/perfectday-source.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: perfectday-source
+          path: /tmp/perfectday-source.zip
+          retention-days: 7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
