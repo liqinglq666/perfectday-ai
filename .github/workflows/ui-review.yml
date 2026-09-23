@@ -1,0 +1,55 @@
+name: UI review
+
+on:
+  push:
+    branches: [design/ui-ux-refresh]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-review-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Unit tests, types, build and journey flow
+        run: npm run check
+      - name: Verify original public assets are unchanged
+        run: git diff --exit-code 8890481216fdd7196cda80517ce7b99d4798217b -- public
+      - name: Install browser review dependencies
+        run: |
+          npm install --no-save --package-lock=false @playwright/test @axe-core/playwright
+          npx playwright install --with-deps chromium
+      - name: Review responsive layouts and interactions
+        run: node scripts/verify-ui.cjs
+      - name: Package tracked source
+        if: always()
+        run: git archive --format=zip HEAD -o /tmp/perfectday-source.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perfectday-source
+          path: /tmp/perfectday-source.zip
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-review-screenshots
+          path: artifacts/ui-review
+          retention-days: 14
