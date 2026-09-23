@@ -44,6 +44,7 @@ export default function AdjustEditor({ input, original, initial, initialChanges 
   const { journey, removed } = replanRemaining(input, draft, changes);
   const plan = journeyPlan(journey, input);
   const before = journeyPlan(original, input);
+  const dirty = changes.length > 0 || JSON.stringify(values) !== JSON.stringify(adjustmentFieldsFromJourney(original));
   const doneCount = original.done.filter(stop => stop.id !== "connector").length;
   const count = plan.stops.filter(stop => stop.id !== "connector").length;
 
@@ -113,6 +114,8 @@ export default function AdjustEditor({ input, original, initial, initialChanges 
         <Image src="/images/ui/replan/perfectday-replan-banner.png" alt="" fill priority sizes="(max-width: 760px) calc(100vw - 36px), 420px"/>
       </div>
     </header>
+
+    <p className="draft-notice"><Icon name="sliders" size={17}/><span><strong>{dirty ? "有尚未保存的调整" : "先看看，再决定"}</strong>预览不会修改原行程，点击保存后才会生效。</span></p>
 
     <div className="adjust-layout">
       <section className="adjust-options" aria-label="调整条件">
