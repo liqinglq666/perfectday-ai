@@ -1,0 +1,260 @@
+/* Hover only for interactive elements; decorative cards do not pretend to click. */
+@media (hover: hover) {
+  .primary-button:hover { background: var(--green-dark); }
+  .secondary-button:hover { background: #edf3e4; border-color: #789566; }
+  .header-inner nav a:hover, .reset-planner:hover, .clear-search:hover { background: #e8efdf; color: var(--green); }
+  .example-chips button:hover, .category-filters button:not([aria-pressed="true"]):hover { border-color: #819b70; background: #edf3e2; }
+  .scene-option:hover>span { border-color: #829a73; }
+  .map-cta:hover { background: #ffe89b; }
+  .complete-cta:hover { background: rgb(255 255 255 / 10%); }
+  .feature-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+}
+/* Medium screens: never squeeze the planner into a narrow sidebar. */
+@media (max-width: 1000px) {
+  .page, .header-inner { padding-left: 28px; padding-right: 28px; }
+  .location { display: none; }
+  .home-page .planning-layout { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 26px; }
+  .home-page .home-intro { display: contents; }
+  .home-copy { grid-column: 1; grid-row: 1; }
+  .home-page .home-intro h1 { font-size: 41px; letter-spacing: -1.8px; }
+  .home-page .home-hero { grid-column: 2; grid-row: 1; height: 100%; min-height: 270px; aspect-ratio: auto; }
+  .home-page .planner-panel { grid-column: 1/-1; grid-row: 2; padding: 28px; }
+  .hero-actions { display: flex; align-items: center; gap: 16px; margin-top: 18px; }
+  .scene-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .scene-option>span { flex-direction: row; min-height: 54px; gap: 8px; }
+  .flow-steps { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .flow-note { display: none; }
+  .trip-layout { grid-template-columns: minmax(0,1fr) 290px; gap: 24px; }
+  .trip-summary { padding: 20px; }
+  .next-stop-actions { grid-template-columns: 1fr; }
+  .next-stop-panel { padding: 24px; }
+  .adjust-options, .replan-card { padding: 21px; }
+  .comparison-grid strong { font-size: 21px; }
+  .guide-editorial-hero { gap: 28px; }
+  .guide-visual-banner { height: 320px; }
+  .place-directory { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .directory-tools { flex-direction: column; align-items: stretch; }
+  .mall-filters { width: fit-content; }
+  .guide-facts { grid-template-columns: 1fr; }
+  .value-note { display: block; }
+  .value-note .primary-button { margin-top: 24px; }
+}
+@media (max-width: 760px) {
+  html { scroll-padding-top: 88px; scroll-padding-bottom: 110px; }
+  .page { padding: 24px 16px 40px; }
+  .header-inner { min-height: 68px; padding: 0 16px; gap: 10px; }
+  .brand { gap: 8px; font-size: 19px; letter-spacing: -.65px; }
+  .brand-mark { flex-basis: 34px; width: 34px; height: 34px; border-radius: 10px; }
+  .brand-subtitle { font-size: 9px; letter-spacing: .8px; margin-top: 4px; }
+  .brand small { display: none; }
+  .header-inner nav { gap: 2px; }
+  .header-inner nav a { min-height: 44px; padding: 0 9px; font-size: 13px; white-space: nowrap; }
+  .header-inner nav svg { display: none; }
+  .home-page { padding-top: 27px; }
+  .home-page .planning-layout { display: grid; grid-template-columns: minmax(0,1fr); gap: 23px; }
+  .home-copy { grid-row: 1; grid-column: 1; max-width: 100%; }
+  .home-page .brand-kicker { font-size: 10px; letter-spacing: 1.6px; }
+  .home-eyebrow { margin-top: 11px; }
+  .home-page .home-intro h1 { font-size: clamp(33px,8.8vw,44px); line-height: 1.22; margin: 16px 0; letter-spacing: -1.5px; }
+  .home-page .intro-copy { font-size: 14px; line-height: 1.9; max-width: 520px; }
+  .home-page .home-benefits { margin: 16px 0 0; gap: 8px 17px; }
+  .home-benefits span { font-size: 12px; }
+  .hero-actions { margin-top: 18px; }
+  .hero-actions .primary-button { min-height: 46px; padding: 11px 18px; }
+  .hero-actions .text-link { font-size: 13px; }
+  .home-page .planner-panel { grid-row: 2; grid-column: 1; padding: 22px 20px; border-radius: 17px; scroll-margin-top: 86px; }
+  .home-page .home-hero { grid-row: 3; grid-column: 1; height: auto; min-height: 0; aspect-ratio: 4/3; border-radius: 16px; }
+  .home-hero .hero-art { object-position: center 64%; }
+  .hero-index { font-size: 9px; }
+  .hero-float-tag { font-size: 12px; }
+  .panel-heading { gap: 10px; margin-bottom: 22px; }
+  .panel-heading h2 { font-size: 22px; }
+  .panel-heading p { font-size: 12px; }
+  .panel-heading .panel-kicker { font-size: 9px; letter-spacing: 1px; }
+  .mini-mark { width: 35px; height: 35px; border-radius: 10px; }
+  .home-page textarea { min-height: 114px; font-size: 16px; padding: 12px; }
+  .request-field>label strong { font-size: 14px; }
+  .request-help p, .request-help small { font-size: 12px; }
+  .example-chips { gap: 6px; }
+  .example-chips button { padding: 8px 9px; font-size: 12px; gap: 4px; }
+  .example-chips svg { width: 14px; }
+  .home-page fieldset { margin-top: 22px; }
+  .scene-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; }
+  .scene-option>span { flex-direction: column; gap: 6px; min-height: 64px; padding: 9px 2px; }
+  .scene-option strong { font-size: 13px; }
+  .preferences { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px 12px; }
+  .preferences label:last-child { grid-column: 1/-1; }
+  .preferences label>span { font-size: 13px; gap: 6px; }
+  .preferences label>span>svg { width: 16px; }
+  .preferences select { font-size: 16px; min-height: 48px; padding: 10px; }
+  .plan-recap { margin-top: 16px; font-size: 12px; }
+  .home-page .main-cta { min-height: 52px; font-size: 15px; }
+  .form-reassurance { font-size: 12px; }
+  .home-page>.recent-trip { padding: 16px; }
+  .recent-trip p { font-size: 12px; }
+  .recent-trip a { font-size: 13px; }
+  .experience-flow { margin-top: 45px; }
+  .flow-heading { margin-bottom: 24px; }
+  .flow-heading h2 { font-size: 26px; letter-spacing: -.6px; }
+  .flow-heading>div>p:last-child { font-size: 14px; }
+  .flow-steps { grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 14px; }
+  .flow-steps article { padding: 23px 0 22px; }
+  .flow-step-icon { position: static; width: 36px; height: 36px; margin-bottom: 12px; }
+  .flow-steps article>small { position: absolute; right: 8px; top: 27px; font-size: 12px; }
+  .flow-steps strong { font-size: 15px; }
+  .flow-steps p { font-size: 12px; }
+  .feature-visual-grid { grid-template-columns: 1fr; gap: 20px; margin-top: 22px; }
+  .feature-card-copy { padding: 21px; }
+  .feature-card-copy h3 { font-size: 21px; }
+  .feature-card-copy p { font-size: 14px; }
+  .home-guide-link { grid-template-columns: 1fr; gap: 12px; padding: 22px; }
+  .summary-mark { display: none; }
+  .home-guide-link .text-link { justify-self: start; margin: 0; }
+  .home-guide-link p { font-size: 13px; }
+  .install-tip summary { font-size: 14px; }
+  .install-tip small { font-size: 12px; }
+  .site-footer { font-size: 12px; }
+  .site-footer small { font-size: 12px; margin-top: 8px; }
+  .trip-heading { gap: 13px; margin-bottom: 24px; }
+  .trip-heading h1 { font-size: 30px; }
+  .trip-intent { margin-bottom: 20px; }
+  .planning-status { font-size: 12px; }
+  .trip-layout { grid-template-columns: 1fr; grid-template-areas: "next" "summary" "route"; gap: 24px; }
+  .journey-progress { padding: 17px 18px; }
+  .journey-progress strong { font-size: 20px; }
+  .journey-progress small, .progress-location { font-size: 12px; }
+  .next-stop-panel { padding: 23px 20px; border-radius: 17px; }
+  .next-stop-panel h2 { font-size: 25px; }
+  .next-stop-topline { gap: 8px; }
+  .next-stop-topline>a { font-size: 12px; }
+  .next-address, .next-facts { font-size: 13px; }
+  .next-facts svg { width: 16px; }
+  .next-stop-actions { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+  .next-stop-actions a { min-height: 50px; font-size: 13px; padding: 11px 7px; gap: 6px; white-space: normal; }
+  .next-stop-footer>span { font-size: 12px; }
+  .skip-action, .next-details summary { font-size: 13px; }
+  .trip-summary { position: static; padding: 23px; border-radius: 16px; }
+  .trip-summary h2 { font-size: 20px; }
+  .balance-grid strong { font-size: 30px; }
+  .metrics dd { font-size: 17px; }
+  .trip-explanation summary, .flexible-time { font-size: 13px; }
+  .stop-row { grid-template-columns: 44px minmax(0,1fr); gap: 15px; }
+  .time-col time { font-size: 12px; }
+  .time-col>span { font-size: 11px; }
+  .stop-main { grid-template-columns: 52px minmax(0,1fr); gap: 5px 11px; padding: 16px 14px 12px; }
+  .stop-visual { width: 52px; height: 75px; }
+  .place-meta { font-size: 12px; }
+  .stop-content h3 { font-size: 16px; }
+  .stop-facts>span { font-size: 11px; }
+  .stop-price { font-size: 12px; }
+  .stop-bottom { margin: 0 14px; gap: 0 8px; }
+  .stop-bottom summary, .map-link { font-size: 12px; }
+  .timeline-end, .route-tail, .photo-note { font-size: 12px; }
+  .completed-history summary { font-size: 14px; }
+  .adjust-page { padding-bottom: calc(126px + env(safe-area-inset-bottom)); }
+  .adjust-heading-with-visual { grid-template-columns: 1fr; gap: 19px; }
+  .adjust-heading h1 { font-size: 30px; }
+  .adjust-heading-copy>p:last-child { font-size: 14px; }
+  .adjust-heading-visual { min-height: 0; aspect-ratio: 16/7; }
+  .draft-notice { padding: 14px 16px; font-size: 13px; }
+  .draft-notice strong { display: block; margin: 0 0 4px; }
+  .adjust-layout { grid-template-columns: 1fr; gap: 24px; }
+  .adjust-options, .replan-card { position: static; padding: 22px 19px; border-radius: 16px; }
+  .remaining-form .section-heading { flex-wrap: wrap; }
+  .remaining-form .section-heading h2 { font-size: 17px; }
+  .remaining-form .section-heading .text-link { font-size: 12px; }
+  .remaining-fields { gap: 17px 12px; }
+  .remaining-fields label { font-size: 13px; }
+  .time-presets button { font-size: 13px; }
+  .change-option { padding: 16px 13px; }
+  .change-option strong { font-size: 15px; }
+  .change-option small { font-size: 12px; }
+  .replan-card h2 { font-size: 22px; }
+  .comparison-grid { gap: 10px; }
+  .comparison-grid strong { font-size: 21px; }
+  .comparison-grid small, .comparison-grid span { font-size: 12px; }
+  .applied-banner { font-size: 13px; }
+  .adjust-list h3 { font-size: 16px; }
+  .adjust-list time { font-size: 12px; }
+  .adjust-savebar { position: fixed; inset: auto 0 0; z-index: 30; display: flex; align-items: center; gap: 14px; padding: 13px 16px calc(13px + env(safe-area-inset-bottom)); background: rgb(255 254 250 / 97%); border-color: var(--border); box-shadow: 0 -4px 20px rgb(32 54 40 / 6%); }
+  .adjust-savebar .use-route { min-height: 51px; margin: 0; flex: 1; font-size: 14px; }
+  .mobile-preview-button { display: flex; min-height: 48px; padding: 0 3px; font-size: 13px; }
+  .mobile-preview-button small { font-size: 12px; }
+  .guide-editorial-hero { grid-template-columns: 1fr; gap: 22px; margin-top: 15px; }
+  .guide-intro h1 { font-size: 32px; letter-spacing: -1px; }
+  .guide-intro>p:not(.eyebrow) { font-size: 14px; }
+  .guide-intro .planning-status { font-size: 12px; }
+  .guide-visual-banner { height: auto; aspect-ratio: 18/8; }
+  .guide-visual-banner>span { font-size: 10px; bottom: 9px; left: 9px; }
+  .guide-nav { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 0 0 28px; padding-bottom: 24px; }
+  .guide-nav a { min-height: 44px; font-size: 13px; padding: 9px; }
+  .section-heading { flex-wrap: wrap; gap: 8px; }
+  .section-heading h2 { font-size: 24px; }
+  .district-card-grid { grid-template-columns: 1fr; gap: 22px; }
+  .district-visual-image { height: auto; aspect-ratio: 16/10; }
+  .district-card-copy { padding: 23px; }
+  .district-card-copy h3 { font-size: 24px; }
+  .guide-facts { gap: 17px; margin-top: 24px; }
+  .guide-facts article { padding: 23px; }
+  .guide-facts h2 { font-size: 21px; }
+  .guide-facts p, .arrival-grid p { font-size: 14px; }
+  .guide-section { margin-top: 37px; }
+  .arrival-grid { grid-template-columns: 1fr; gap: 16px; }
+  .arrival-grid article { padding: 23px; }
+  .arrival-grid h3 { font-size: 18px; }
+  .directory-tools { display: flex; gap: 13px; }
+  .directory-search input { font-size: 16px; }
+  .mall-filters { width: 100%; margin: 0; gap: 3px; }
+  .mall-filters button { flex: 1; font-size: 12px; padding: 8px 5px; }
+  .category-filters { gap: 7px; }
+  .category-filters button { min-height: 44px; padding: 8px 11px; font-size: 12px; }
+  .directory-count { font-size: 13px; }
+  .place-directory { grid-template-columns: 1fr; gap: 15px; }
+  .directory-card { padding: 21px 21px 9px; }
+  .directory-card-head h3 { font-size: 18px; }
+  .directory-card details p { font-size: 13px; }
+  .value-note { margin-top: 35px; padding: 25px; }
+  .value-note h2 { font-size: 23px; }
+  .value-note p { font-size: 14px; }
+  .value-note .primary-button { width: 100%; }
+}
+@media (max-width: 370px) {
+  .header-inner { padding: 0 14px; }
+  .brand { font-size: 17px; gap: 6px; }
+  .brand-mark { flex-basis: 30px; width: 30px; height: 30px; }
+  .header-inner nav a { font-size: 12px; padding: 0 7px; }
+  .home-page .planner-panel { padding: 20px 16px; }
+  .panel-heading h2 { font-size: 20px; }
+  .panel-heading .panel-kicker { letter-spacing: .6px; font-size: 8px; }
+  .mini-mark { display: none; }
+  .example-chips button { flex: 1 1 auto; }
+  .next-stop-actions { grid-template-columns: 1fr; }
+  .remaining-fields { grid-template-columns: 1fr; }
+  .comparison-grid { grid-template-columns: 1fr; padding: 15px 0; gap: 14px; }
+  .comparison-grid>div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
+  .comparison-grid small { flex: 1; margin: 0; }
+  .comparison-grid strong { font-size: 21px; }
+  .change-grid { grid-template-columns: 1fr; }
+  .change-option { min-height: 90px; }
+}
+@media (max-height: 520px) and (max-width: 760px) {
+  .adjust-savebar { position: static; padding: 16px 0 0; box-shadow: none; border: 0; }
+  .adjust-page { padding-bottom: 35px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media (forced-colors: active) {
+  .scene-option input:checked+span, .example-chips button[aria-pressed="true"], .category-filters button[aria-pressed="true"], .mall-filters button[aria-pressed="true"] { outline: 2px solid Highlight; }
+  .selection-check { forced-color-adjust: auto; }
+}
+@media print {
+  .site-header, .skip-link, .route-actions, .next-stop-actions, .skip-action, .adjust-savebar, .hero-actions, .planner-panel { display: none !important; }
+  .page { max-width: none; padding: 0; }
+  .trip-layout { display: block; }
+  .trip-summary, .replan-card { position: static; margin-top: 20px; }
+  .next-stop-panel { background: #fff; color: #000; box-shadow: none; border: 1px solid #aaa; }
+  .next-stop-panel * { color: #222 !important; }
+  .stop-card, .directory-card { break-inside: avoid; }
+}
