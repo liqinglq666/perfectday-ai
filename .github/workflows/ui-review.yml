@@ -21,28 +21,22 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npm run check
-      - name: Package review runtime
-        if: ${{ hashFiles('scripts/verify-ui.cjs') == '' }}
-        run: tar -czf /tmp/review-runtime.tgz node_modules .next
-      - uses: actions/upload-artifact@v4
-        if: ${{ hashFiles('scripts/verify-ui.cjs') == '' }}
-        with:
-          name: review-runtime
-          path: /tmp/review-runtime.tgz
-          retention-days: 1
+      - name: Unit tests, types, build and journey flow
+        run: npm run check
+      - name: Verify original public assets are unchanged
+        run: git diff --exit-code 8890481216fdd7196cda80517ce7b99d4798217b -- public
       - name: Install browser review dependencies
-        if: ${{ hashFiles('scripts/verify-ui.cjs') != '' }}
         run: |
           npm install --no-save --package-lock=false @playwright/test @axe-core/playwright
           npx playwright install --with-deps chromium
       - name: Review responsive layouts and interactions
-        if: ${{ hashFiles('scripts/verify-ui.cjs') != '' }}
         run: node scripts/verify-ui.cjs
       - name: Package tracked source
         if: always()
@@ -54,7 +48,7 @@ jobs:
           path: /tmp/perfectday-source.zip
           retention-days: 7
       - uses: actions/upload-artifact@v4
-        if: ${{ always() && hashFiles('scripts/verify-ui.cjs') != '' }}
+        if: always()
         with:
           name: ui-review-screenshots
           path: artifacts/ui-review
