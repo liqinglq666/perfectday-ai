@@ -11,6 +11,6 @@ export default function SubmitButton() {
       <span>{pending ? "正在理解需求并规划…" : "开始生成今天的路线"}</span>
       {pending ? <span className="spinner" aria-hidden="true"/> : <Icon name="arrow"/>}
     </button>
-    <span className="sr-only" role="status" aria-live="polite">{pending ? "正在规划，请稍候。" : ""}</span>
+    <span className="planning-feedback" role="status" aria-live="polite">{pending ? "正在整理地点、时间与预算，请稍候。" : ""}</span>
   </>;
 }
