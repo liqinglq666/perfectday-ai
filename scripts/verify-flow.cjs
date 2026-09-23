@@ -73,6 +73,14 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
     assert.equal(JSON.stringify(afterQueue.done), JSON.stringify(beforeQueue.done));
     assert.equal(afterQueue.current, 'holiday'); assert.equal(afterQueue.pending[0].id, 'holiday-ajisen');
     assert((await queued.text()).includes('味千拉面'));
+    const queueAgain = new URL(queued.url);
+    queueAgain.pathname = '/adjust';
+    queueAgain.searchParams.set('changes', 'queue'); queueAgain.searchParams.set('mode', 'save');
+    const exhausted = await navigate(queueAgain.href);
+    const exhaustedState = JSON.parse(new URL(exhausted.url).searchParams.get('journey'));
+    assert.equal(exhaustedState.pending[0].q, 1);
+    assert.equal(exhaustedState.unavailableMeals.join(','), 'holiday-cafe-de-coral,holiday-ajisen');
+    assert.equal(JSON.stringify(exhaustedState.done), JSON.stringify(beforeQueue.done));
     const action = home.match(/name="(\$ACTION_ID_[^"]+)"/)[1];
     const body = new FormData(); body.set(action, ''); body.set('request', '一个人逛两小时，不喝咖啡，想逛宜得利'); body.set('scene', 'solo'); body.set('duration', '120'); body.set('budget', '100'); body.set('walking', 'low');
     const result = await navigate(origin, { method: 'POST', body, headers: { Origin: origin } });
@@ -83,6 +91,14 @@ async function page(path) { const r = await navigate(path); assert.equal(r.statu
     assert(resultPage.includes('想去 NITORI 宜得利'));
     assert(resultPage.includes('不安排咖啡'));
     assert(/基础(?:路线)?规划/.test(resultPage));
-    console.log('PASS: server-rendered home, simplified guide, trip intent explanation, completion, adjustment form with multiple flags, save, reload, finish, direct-save of edited conditions, and no-key form action.');
+    body.set('request', '预算50元，只有90分钟，和朋友逛街');
+    body.set('scene', 'friends'); body.set('duration', '240'); body.set('budget', '500');
+    const constrained = await navigate(origin, { method: 'POST', body, headers: { Origin: origin } });
+    const constrainedPage = await constrained.text();
+    assert(constrainedPage.includes('¥50内'));
+    const constrainedUrl = new URL(anchor(constrainedPage, '重排剩余行程'), origin);
+    const constrainedState = JSON.parse(constrainedUrl.searchParams.get('journey'));
+    assert.equal(constrainedState.cash, 50); assert.equal(constrainedState.minutes, 90);
+    console.log('PASS: server-rendered home, guide, completion, adjustment, save/reload, finish, no-key action, exact budget/minute limits, and persistent queue exhaustion.');
   } finally { clearTimeout(timeout); server.kill(); }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

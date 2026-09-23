@@ -2,6 +2,7 @@ import "server-only";
 
 import { places } from "@/data/places";
 import { isBudget, isScene, isWalking } from "@/lib/plan-config";
+import { applyRequestLimits } from "@/lib/request-limits";
 import type { PlanInput } from "@/types";
 
 const DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1";
@@ -13,8 +14,9 @@ const SYSTEM_PROMPT = `你是 PerfectDay AI 的出行需求解析器，服务中
 只输出一个 JSON 对象，不要 Markdown、解释或思考过程。
 必填字段：scene、duration、budget、walking、preferredPlaceIds、excludedPlaceIds、indoorOnly。
 scene 只能是 date（约会）、family（亲子）、parents（陪长辈）、friends（朋友）、solo（独处）、rain（雨天）。
-duration 是分钟整数，范围 90–480。budget 只能是字符串 "100"、"300"、"500"、"plus"，表示现有预算档位。
+duration 是分钟整数，范围 1–480。budget 只能是字符串 "100"、"300"、"500"、"plus"，表示现有预算档位；用户给出的精确金额仍由本地程序作为硬上限保留。
 walking 只能是 normal 或 low。indoorOnly 是布尔值；用户要求室内或说明下雨时为 true。
+天气不覆盖同行人：雨天带孩子仍为 family，雨天陪爸妈仍为 parents，并设置 indoorOnly=true。
 自然语言明确提及的需求优先于表单选项；未提及的字段保留表单值，不自行添加限制。
 泛称吃晚饭、吃饭时不要把多家餐厅都加入偏好；正餐角色由本地路线模板安排，只有点名餐厅或明确菜系时才设置餐饮偏好。
 preferredPlaceIds 是用户明确想去的候选地点 ID；excludedPlaceIds 是明确不想去的地点 ID。
@@ -35,12 +37,12 @@ function validIds(value: unknown): value is string[] {
 function decodeIntent(value: unknown, input: PlanInput): PlanInput | null {
   if (!isRecord(value) || !isScene(value.scene) || !isBudget(value.budget) ||
       !isWalking(value.walking) || typeof value.duration !== "number" ||
-      !Number.isInteger(value.duration) || value.duration < 90 || value.duration > 480 ||
+      !Number.isInteger(value.duration) || value.duration < 1 || value.duration > 480 ||
       typeof value.indoorOnly !== "boolean" || !validIds(value.preferredPlaceIds) ||
       !validIds(value.excludedPlaceIds)) return null;
 
   const excluded = new Set(value.excludedPlaceIds);
-  return {
+  return applyRequestLimits({
     request: input.request,
     scene: value.scene,
     duration: value.duration,
@@ -50,7 +52,7 @@ function decodeIntent(value: unknown, input: PlanInput): PlanInput | null {
     preferredPlaceIds: [...new Set(value.preferredPlaceIds)].filter((id) => !excluded.has(id)),
     excludedPlaceIds: [...excluded],
     intentSource: "bailian"
-  };
+  });
 }
 
 /** One server-side request per submitted requirement. No retries or background calls. */

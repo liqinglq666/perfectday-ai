@@ -33,7 +33,7 @@
 .directory-card-head small { font-size: 10px; color: var(--muted); }
 .directory-card-head h3 { font-size: 16px; margin-top: 4px; line-height: 1.6; }
 .category-stamp { display: grid; place-items: center; width: 44px; height: 48px; flex-shrink: 0; border-radius: 12px; background: #eaf0e2; color: #637c4e; }
-.category-coffee { background: #f3e8dd; color: #9b6a49; }
+.category-coffee, .category-dessert { background: #f3e8dd; color: #9b6a49; }
 .category-culture { background: #eae9f0; color: #7a718f; }
 .category-food { background: #f5e9de; color: #a97648; }
 .directory-floor { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 11px; margin: 15px 0 6px; }

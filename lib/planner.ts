@@ -1,6 +1,6 @@
 import { applyClosedPlaceHints } from "@/lib/closed-places";
 import {
-  BUDGET_CAP,
+  budgetCap,
   PLAN_TEMPLATES,
   SCENE_COPY,
   isBudget,
@@ -13,9 +13,11 @@ import {
   hasPlace,
   insertBeforeFood,
   orderByMall,
-  requirePlace
+  requirePlace,
+  sameCategoryRole
 } from "@/lib/place-catalog";
 import { applyRequestHints } from "@/lib/request-hints";
+import { applyRequestLimits } from "@/lib/request-limits";
 import type { AdjustmentChange, PlanInput, Place, Scene, TripPlan, TripStop } from "@/types";
 
 export { isBudget, isScene, isWalking };
@@ -36,7 +38,7 @@ function applyResolvedPlaces(items: Place[], input: PlanInput) {
     if (!place || excluded.has(id) || result.some((item) => item.id === id)) continue;
 
     const sameCategory = result.findIndex((item) =>
-      item.category === place.category && !input.preferredPlaceIds?.includes(item.id));
+      sameCategoryRole(item.category, place.category) && !input.preferredPlaceIds?.includes(item.id));
 
     if (sameCategory >= 0) result[sameCategory] = place;
     else result = insertBeforeFood(result, place);
@@ -53,7 +55,7 @@ function withinLimits(items: Place[], input: PlanInput) {
   const preferred = new Set(input.preferredPlaceIds || []);
 
   while (result.length && (
-    result.reduce((sum, item) => sum + item.price, 0) > BUDGET_CAP[input.budget] ||
+    result.reduce((sum, item) => sum + item.price, 0) > budgetCap(input) ||
     result.reduce((sum, item) => sum + item.duration + item.walkMinutes, 0) > input.duration
   )) {
     const candidates = result
@@ -100,11 +102,12 @@ function oneMallWithAlternatives(items: Place[], input: PlanInput): Place[] {
 
   let result = [...selected];
   for (const category of missingCategories) {
-    if (result.some((item) => item.category === category)) continue;
+    if (result.some((item) => sameCategoryRole(item.category, category))) continue;
     const candidate = allPlaces.find((item) =>
       item.mall === mall &&
-      item.category === category &&
+      sameCategoryRole(item.category, category) &&
       item.tags.includes(input.scene) &&
+      (!(input.indoorOnly || input.scene === "rain") || item.indoor) &&
       !excluded.has(item.id));
     if (candidate) result = insertBeforeFood(result, candidate);
   }
@@ -132,6 +135,21 @@ function summarize(items: Place[], copy: { title: string; subtitle: string }): T
 export function createPlan(rawInput: PlanInput): TripPlan {
   const input = applyRequestHints(applyClosedPlaceHints(rawInput));
   let selected = applyResolvedPlaces(PLAN_TEMPLATES[input.scene].map(requirePlace), input);
+
+  // A filtered-out template does not imply an empty catalog. Refill using only
+  // eligible, individually affordable stops; the usual route constraints still apply.
+  if (!selected.some(item => item.category !== "connector")) {
+    const excluded = new Set(input.excludedPlaceIds || []);
+    selected = [];
+    for (const place of allPlaces) {
+      if (["start", "connector"].includes(place.category) || excluded.has(place.id) ||
+        !place.tags.includes(input.scene) ||
+        ((input.indoorOnly || input.scene === "rain") && !place.indoor) ||
+        place.price > budgetCap(input) || place.duration + place.walkMinutes > input.duration ||
+        selected.some(item => sameCategoryRole(item.category, place.category))) continue;
+      selected.push(place);
+    }
+  }
 
   // Public reports confirm connection, but do not establish a fully sheltered path.
   if (input.indoorOnly || input.scene === "rain") selected = oneMallWithAlternatives(selected, input);
@@ -236,12 +254,14 @@ export function parseInput(params: Record<string, string | string[] | undefined>
   const budget = value("budget", "500");
   const walking = value("walking", "low");
   const source = value("ai", "");
+  const cap = value("cap", "");
 
   const input: PlanInput = {
     request: value("request", "").slice(0, 600),
     scene: isScene(scene) ? scene : "friends",
-    duration: Number.isFinite(duration) ? Math.max(90, Math.min(480, Math.round(duration))) : 240,
+    duration: Number.isFinite(duration) ? Math.max(1, Math.min(480, Math.floor(duration))) : 240,
     budget: isBudget(budget) ? budget : "500",
+    ...(/^\d{1,5}$/.test(cap) && Number(cap) <= 10000 ? { budgetLimit: Number(cap) } : {}),
     walking: isWalking(walking) ? walking : "low",
     ...(source === "bailian" ? {
       intentSource: "bailian" as const,
@@ -251,7 +271,7 @@ export function parseInput(params: Record<string, string | string[] | undefined>
     } : source === "fallback" ? { intentSource: "fallback" as const } : {})
   };
 
-  const parsed = inferRequest ? applyRequestHints(input) : input;
+  const parsed = inferRequest ? applyRequestHints(applyRequestLimits(input)) : input;
   return applyClosedPlaceHints(parsed);
 }
 
@@ -269,6 +289,7 @@ export function queryString(input: PlanInput) {
     walking: input.walking
   });
   if (input.intentSource) params.set("ai", input.intentSource);
+  if (input.budgetLimit !== undefined) params.set("cap", String(budgetCap(input)));
   if (input.intentSource === "bailian") {
     if (input.preferredPlaceIds?.length) params.set("preferred", input.preferredPlaceIds.join(","));
     if (input.excludedPlaceIds?.length) params.set("excluded", input.excludedPlaceIds.join(","));

@@ -80,7 +80,7 @@ export const holidayCandidates: Place[] = [
     mall: "假日广场",
     floor: "1F · G层C111-1",
     address: "中山市石岐区兴中道6号假日广场一楼G层C111-1号",
-    category: "coffee",
+    category: "dessert",
     tags: ["date", "family", "parents", "friends", "solo", "rain"],
     duration: 35,
     price: 30,

@@ -33,7 +33,9 @@
 
 这些默认值在 `lib/bailian.ts` 与 `lib/ai-rate-limit.ts` 中生效，Vercel 无需再填写 Base URL 或模型名称。
 
-应用侧限流是轻量、尽力而为的保护：只在当前运行实例的内存中保存经过哈希的来源标识，不持久化原始 IP 或用户文本，也不引入数据库/Redis。Serverless 多实例环境下它不是全局硬额度，因此比赛公开网址上线前，仍建议在百炼账户侧设置可接受的消费/额度上限；账户侧额度才是最终成本保护。
+应用侧限流按经过哈希的 IP 计数，改变 User-Agent 不会重置额度，不保存原始 IP 或用户文本。默认使用进程内计数；Serverless 多实例下，启用共享限流需要同时配置 `UPSTASH_REDIS_REST_URL` 与 `UPSTASH_REDIS_REST_TOKEN`（也支持现有的 `KV_REST_API_URL` / `KV_REST_API_TOKEN`）。这些是服务端变量，不可加 `NEXT_PUBLIC_` 前缀。
+
+共享计数使用 Redis 原子脚本维护同一 IP 的分钟、小时额度，配置后所有实例使用相同的计数。配置缺失一半、连接超时或 Redis 拒绝请求时，不调用付费模型，直接回退本地规划。未配置 Redis 时仅提供单实例保护；百炼账户侧的消费/额度上限仍是最终成本保护。新增共享限流变量后需要重新部署。
 
 如果 Key 来自新加坡而不是北京，请另外设置 `DASHSCOPE_BASE_URL=https://dashscope-intl.aliyuncs.com/compatible-mode/v1`，并重新部署。Key 必须与接口地域一致。也支持在 `DASHSCOPE_BASE_URL` 填写控制台提供的业务空间专属域名，以及用 `DASHSCOPE_MODEL` 覆盖模型；所选模型须支持非思考模式的 JSON 输出。
 
@@ -49,7 +51,7 @@
 
 解析后的偏好随行程链接传递。刷新、分享链接、打开调整页及点击四种调整选项，都不会再次调用模型。首页快捷示例只在用户提交文字需求时触发一次理解；PWA manifest 不再提供额外长按快捷路线入口。
 
-当前沿用原有预算档位和 14:00 起始时间，不是精确任意金额或任意出发时间规划。商业模型调用按百炼账户权益和计费规则处理，未配置 Key 时可继续使用本地功能。
+表单保留原有预算档位，文字中的精确预算（如50元）另存为硬上限，并用于行程余额；分钟、小时及混合时长均参与约束，最多规划480分钟。默认14:00出发，可在途中调整页修改时间。天气条件与同行人分别处理，雨天亲子仍保留亲子需求。商业模型调用按百炼账户权益和计费规则处理，未配置 Key 时可继续使用本地功能。
 
 ## 出错时查看
 
@@ -83,3 +85,4 @@ npm run dev
 - [百炼 JSON 结构化输出](https://help.aliyun.com/zh/model-studio/qwen-structured-output)
 - [获取 API Key](https://help.aliyun.com/zh/model-studio/get-api-key)
 - [Vercel 环境变量](https://vercel.com/docs/environment-variables)
+- [Upstash Redis REST API](https://upstash.com/docs/redis/features/restapi)

@@ -15,7 +15,7 @@ import {
 
 export function RememberTrip({ href, title, done, left }: Omit<SavedTrip, "v" | "savedAt">) {
   const [undo, setUndo] = useState<TripUndo | null>(null);
-  const consumedUndo = useRef(false);
+  const consumedHref = useRef<string | null>(null);
 
   useEffect(() => {
     try {
@@ -24,8 +24,10 @@ export function RememberTrip({ href, title, done, left }: Omit<SavedTrip, "v" | 
       // URL sharing still works when storage is unavailable.
     }
 
-    if (consumedUndo.current) return;
-    consumedUndo.current = true;
+    // Read once per destination, including same-page navigation. The ref also
+    // prevents StrictMode's repeated effect from consuming the record twice.
+    if (consumedHref.current === href) return;
+    consumedHref.current = href;
 
     try {
       const nextUndo = readTripUndo(sessionStorage.getItem(UNDO_TRIP_KEY), href);
@@ -36,7 +38,7 @@ export function RememberTrip({ href, title, done, left }: Omit<SavedTrip, "v" | 
     }
   }, [href, title, done, left]);
 
-  if (!undo) return null;
+  if (!undo || undo.to !== href) return null;
 
   const message = undo.label === "跳过这一站"
     ? "已跳过这一站"

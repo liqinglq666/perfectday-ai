@@ -3,7 +3,7 @@ export type Budget = "100" | "300" | "500" | "plus";
 export type Walking = "normal" | "low";
 export type AdjustmentChange = "rain" | "walk" | "budget" | "queue";
 
-export type PlaceCategory = "start" | "culture" | "coffee" | "food" | "shopping" | "family" | "rest" | "connector" | "activity";
+export type PlaceCategory = "start" | "culture" | "coffee" | "dessert" | "food" | "shopping" | "family" | "rest" | "connector" | "activity";
 export type EvidenceStatus = "online_listing" | "published_reference" | "public_area";
 export type LocationPrecision = "exact" | "mall" | "area";
 
@@ -12,6 +12,8 @@ export interface PlanInput {
   scene: Scene;
   duration: number;
   budget: Budget;
+  /** Explicit amount from the request, retained separately from the form's budget tier. */
+  budgetLimit?: number;
   walking: Walking;
   intentSource?: "bailian" | "fallback";
   preferredPlaceIds?: string[];

@@ -7,7 +7,7 @@ import NextStopPanel from "@/app/components/trip/next-stop-panel";
 import TripHistory from "@/app/components/trip/trip-history";
 import TripSummary from "@/app/components/trip/trip-summary";
 import { closedPlaceNotices } from "@/lib/closed-places";
-import { BUDGET_CAP, SCENE_COPY } from "@/lib/plan-config";
+import { budgetCap, SCENE_COPY } from "@/lib/plan-config";
 import { allPlaces, getPlace } from "@/lib/place-catalog";
 import { parseInput, queryString } from "@/lib/planner";
 import { decodeJourney, journeyPlan, journeyUrl, readJourney } from "@/lib/journey";
@@ -15,7 +15,8 @@ import type { PlaceCategory, PlanInput } from "@/types";
 
 const CATEGORY_LABELS: Partial<Record<PlaceCategory, string>> = {
   culture: "书店/文化",
-  coffee: "咖啡/甜品",
+  coffee: "咖啡",
+  dessert: "甜品",
   food: "正餐",
   shopping: "购物",
   family: "亲子",
@@ -40,7 +41,7 @@ function inputSummary(input: PlanInput) {
   const tags = [
     SCENE_COPY[input.scene].title.split(" · ")[0],
     durationLabel(input.duration),
-    `¥${BUDGET_CAP[input.budget]}内`,
+    `¥${budgetCap(input)}内`,
     input.walking === "low" ? "少走路" : "正常步行"
   ];
 

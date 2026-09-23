@@ -12,6 +12,7 @@ type CategoryMeta = [label: string, icon: string];
 const CATEGORY_META: Partial<Record<PlaceCategory, CategoryMeta>> = {
   culture: ["阅读", "book"],
   coffee: ["咖啡", "coffee"],
+  dessert: ["甜品", "coffee"],
   food: ["用餐", "food"],
   family: ["亲子", "family"],
   shopping: ["逛店", "wallet"],
