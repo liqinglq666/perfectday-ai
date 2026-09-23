@@ -2,3 +2,13 @@
 @import "./ui-foundation.css";
 @import "./ui-pages.css";
 @import "./ui-responsive.css";
+
+/* Shared secondary-text contrast across the retained pale surfaces. */
+.page .eyebrow,
+.flow-note,
+.flow-steps article>small,
+.site-footer,
+.stop-facts>span,
+.district-card-copy>span,
+.guide-facts article>span,
+.directory-card-actions>span { color: #526548; }
