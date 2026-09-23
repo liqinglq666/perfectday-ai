@@ -47,29 +47,23 @@ function isNegative(text: string, pattern: string) {
 export function applyRequestHints(rawInput: PlanInput): PlanInput {
   const input = rawInput.intentSource === "bailian" ? rawInput : applyRequestLimits(rawInput);
   const text = input.request.trim();
-  const indoorOnly = input.indoorOnly || input.scene === "rain" ||
-    /下雨|雨天|只想室内|尽量.*室内|室内为主|不去室外|在室内/.test(text);
-  // Generic dinner requests are a route role, not a mandate to visit every AI candidate.
-  // A named meal preference may cross malls; unnamed alternatives stay with local constraints.
+  // Trust validated semantics, including negations and cuisine synonyms. Only an
+  // explicit generic-meal classification can discard AI restaurant candidates.
   if (input.intentSource === "bailian") {
-    const mealNames: Record<string, RegExp> = {
-      "golden-food": /太二|酸菜鱼/i,
-      "golden-zhenlong": /臻龙|臻龍|葡式|茶餐厅|茶餐廳/i,
-      "golden-longfa": /龙发|龍發|鸡煲|雞煲/i,
-      "holiday-cafe-de-coral": /大家乐|大家樂|簡餐|简餐|快餐/i,
-      "holiday-ajisen": /味千|拉面|拉麵/i
-    };
     return {
       ...input,
-      indoorOnly,
-      scene: input.scene === "rain" ? inferScene(text, input.scene) : input.scene,
-      preferredPlaceIds: (input.preferredPlaceIds || []).filter(id => {
-        const place = places.find(item => item.id === id);
-        return place?.category !== "food" || mealNames[id]?.test(input.request);
-      })
+      preferredPlaceIds: (input.preferredPlaceIds || []).filter(id =>
+        !input.excludedPlaceIds?.includes(id) &&
+        (input.mealIntent !== "generic" || places.find(item => item.id === id)?.category !== "food"))
     };
   }
   if (!text) return input;
+  const rainy = text.split(/[，,。；;！？!?\n]/).some(clause => {
+    const weather = clause.replace(/(?:不(?:会|再)?|没(?:有)?|无|不是)(?:再)?(?:下雨|雨天|雨)/g, "");
+    return /下雨|雨天/.test(weather);
+  });
+  const indoorOnly = input.indoorOnly || input.scene === "rain" || rainy ||
+    /只想室内|尽量[^，,。；;！？!?\n]*室内|室内为主|不去室外|在室内/.test(text);
 
   const excluded = new Set(input.excludedPlaceIds || []);
   const preferred = new Set(input.preferredPlaceIds || []);
@@ -96,7 +90,7 @@ export function applyRequestHints(rawInput: PlanInput): PlanInput {
     excluded.add("connector");
   }
 
-  if (preferred.has("luckin-coffee") || preferred.has("holiday-dessert")) preferred.delete("daka-coffee");
+  if (preferred.has("luckin-coffee")) preferred.delete("daka-coffee");
   if (preferred.has("holiday-cafe-de-coral")) preferred.delete("golden-food");
 
   return {

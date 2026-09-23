@@ -17,7 +17,6 @@ import {
   sameCategoryRole
 } from "@/lib/place-catalog";
 import { applyRequestHints } from "@/lib/request-hints";
-import { applyRequestLimits } from "@/lib/request-limits";
 import type { AdjustmentChange, PlanInput, Place, Scene, TripPlan, TripStop } from "@/types";
 
 export { isBudget, isScene, isWalking };
@@ -108,6 +107,7 @@ function oneMallWithAlternatives(items: Place[], input: PlanInput): Place[] {
       sameCategoryRole(item.category, category) &&
       item.tags.includes(input.scene) &&
       (!(input.indoorOnly || input.scene === "rain") || item.indoor) &&
+      item.price <= budgetCap(input) && item.duration + item.walkMinutes <= input.duration &&
       !excluded.has(item.id));
     if (candidate) result = insertBeforeFood(result, candidate);
   }
@@ -132,25 +132,8 @@ function summarize(items: Place[], copy: { title: string; subtitle: string }): T
   };
 }
 
-export function createPlan(rawInput: PlanInput): TripPlan {
-  const input = applyRequestHints(applyClosedPlaceHints(rawInput));
-  let selected = applyResolvedPlaces(PLAN_TEMPLATES[input.scene].map(requirePlace), input);
-
-  // A filtered-out template does not imply an empty catalog. Refill using only
-  // eligible, individually affordable stops; the usual route constraints still apply.
-  if (!selected.some(item => item.category !== "connector")) {
-    const excluded = new Set(input.excludedPlaceIds || []);
-    selected = [];
-    for (const place of allPlaces) {
-      if (["start", "connector"].includes(place.category) || excluded.has(place.id) ||
-        !place.tags.includes(input.scene) ||
-        ((input.indoorOnly || input.scene === "rain") && !place.indoor) ||
-        place.price > budgetCap(input) || place.duration + place.walkMinutes > input.duration ||
-        selected.some(item => sameCategoryRole(item.category, place.category))) continue;
-      selected.push(place);
-    }
-  }
-
+function constrainRoute(items: Place[], input: PlanInput): Place[] {
+  let selected = items;
   // Public reports confirm connection, but do not establish a fully sheltered path.
   if (input.indoorOnly || input.scene === "rain") selected = oneMallWithAlternatives(selected, input);
   if (input.excludedPlaceIds?.includes("connector")) selected = oneMallWithAlternatives(selected, input);
@@ -161,7 +144,30 @@ export function createPlan(rawInput: PlanInput): TripPlan {
     if (preferredMalls.size <= 1) selected = oneMallWithAlternatives(selected, input);
   }
 
-  return summarize(withinLimits(selected, input), SCENE_COPY[input.scene]);
+  return withinLimits(selected, input);
+}
+
+export function createPlan(rawInput: PlanInput): TripPlan {
+  const input = applyRequestHints(applyClosedPlaceHints(rawInput));
+  let selected = constrainRoute(applyResolvedPlaces(PLAN_TEMPLATES[input.scene].map(requirePlace), input), input);
+
+  // Only after all constraints (including price/time) can we know the template
+  // is exhausted. Initial planning may refill; remaining-trip adjustments do not.
+  if (!selected.some(item => item.category !== "connector")) {
+    const excluded = new Set(input.excludedPlaceIds || []);
+    const candidates: Place[] = [];
+    for (const place of allPlaces) {
+      if (["start", "connector"].includes(place.category) || excluded.has(place.id) ||
+        !place.tags.includes(input.scene) ||
+        ((input.indoorOnly || input.scene === "rain") && !place.indoor) ||
+        place.price > budgetCap(input) || place.duration + place.walkMinutes > input.duration ||
+        candidates.some(item => sameCategoryRole(item.category, place.category))) continue;
+      candidates.push(place);
+    }
+    selected = constrainRoute(candidates, input);
+  }
+
+  return summarize(selected, SCENE_COPY[input.scene]);
 }
 
 export function adjustPlan(rawInput: PlanInput, change: AdjustmentChange | AdjustmentChange[]): TripPlan {
@@ -255,6 +261,7 @@ export function parseInput(params: Record<string, string | string[] | undefined>
   const walking = value("walking", "low");
   const source = value("ai", "");
   const cap = value("cap", "");
+  const mealIntent = value("meal", "");
 
   const input: PlanInput = {
     request: value("request", "").slice(0, 600),
@@ -267,11 +274,13 @@ export function parseInput(params: Record<string, string | string[] | undefined>
       intentSource: "bailian" as const,
       preferredPlaceIds: ids("preferred"),
       excludedPlaceIds: ids("excluded"),
-      indoorOnly: value("indoor", "0") === "1"
+      indoorOnly: value("indoor", "0") === "1",
+      ...(["none", "generic", "specific"].includes(mealIntent)
+        ? { mealIntent: mealIntent as PlanInput["mealIntent"] } : {})
     } : source === "fallback" ? { intentSource: "fallback" as const } : {})
   };
 
-  const parsed = inferRequest ? applyRequestHints(applyRequestLimits(input)) : input;
+  const parsed = inferRequest ? applyRequestHints(input) : input;
   return applyClosedPlaceHints(parsed);
 }
 
@@ -294,6 +303,7 @@ export function queryString(input: PlanInput) {
     if (input.preferredPlaceIds?.length) params.set("preferred", input.preferredPlaceIds.join(","));
     if (input.excludedPlaceIds?.length) params.set("excluded", input.excludedPlaceIds.join(","));
     if (input.indoorOnly) params.set("indoor", "1");
+    if (input.mealIntent) params.set("meal", input.mealIntent);
   }
   return params.toString();
 }

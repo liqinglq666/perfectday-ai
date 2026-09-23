@@ -26,7 +26,7 @@ const { interpretWithBailian } = load('lib/bailian');
 const planner = load('lib/planner');
 const { places } = load('data/places');
 const base = { request: '带父母逛四个小时，不喝咖啡，想逛宜得利，尽量待在室内', scene: 'friends', duration: 240, budget: '300', walking: 'low' };
-const valid = { scene: 'parents', duration: 240, budget: '300', walking: 'low', preferredPlaceIds: ['nitori'], excludedPlaceIds: ['daka-coffee', 'luckin-coffee'], indoorOnly: true };
+const valid = { scene: 'parents', duration: 240, budget: '300', budgetLimit: null, mealIntent: 'none', walking: 'low', preferredPlaceIds: ['nitori'], excludedPlaceIds: ['daka-coffee', 'luckin-coffee'], indoorOnly: true };
 const ok = (intent = valid) => ({ ok: true, status: 200, json: async () => ({ choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(intent) } }] }) });
 async function run() {
   assert.equal(await interpretWithBailian(base), base);
@@ -63,7 +63,10 @@ async function run() {
     reply = () => ({ ok: false, status });
     assert.equal((await interpretWithBailian(base)).intentSource, 'fallback');
   }
-  for (const intent of [null, {}, { ...valid, scene: '__proto__' }, { ...valid, duration: 999999 }, { ...valid, budget: 'abc' }, { ...valid, preferredPlaceIds: ['invented-shop'] }, { ...valid, indoorOnly: 'true' }]) {
+  for (const intent of [null, {}, { ...valid, scene: '__proto__' }, { ...valid, duration: 999999 }, { ...valid, budget: 'abc' }, { ...valid, preferredPlaceIds: ['invented-shop'] }, { ...valid, indoorOnly: 'true' },
+    { ...valid, budgetLimit: -1 }, { ...valid, budgetLimit: 10001 }, { ...valid, budgetLimit: '50' },
+    { ...valid, budgetLimit: 1.5 }, { ...valid, budgetLimit: undefined }, { ...valid, mealIntent: 'all' },
+    { ...valid, mealIntent: ['none'] }, { ...valid, mealIntent: undefined }]) {
     reply = () => ok(intent);
     assert.equal((await interpretWithBailian(base)).intentSource, 'fallback');
   }

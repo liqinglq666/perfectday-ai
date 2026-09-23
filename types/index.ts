@@ -19,6 +19,8 @@ export interface PlanInput {
   preferredPlaceIds?: string[];
   excludedPlaceIds?: string[];
   indoorOnly?: boolean;
+  /** AI distinguishes an ordinary meal slot from a specific restaurant/cuisine request. */
+  mealIntent?: "none" | "generic" | "specific";
 }
 
 export interface Place {
