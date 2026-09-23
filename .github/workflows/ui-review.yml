@@ -8,22 +8,54 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ui-review-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+
 jobs:
   review:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Package tracked source for review
-        run: git archive --format=zip HEAD -o /tmp/perfectday-source.zip
-      - uses: actions/upload-artifact@v4
-        with:
-          name: perfectday-source
-          path: /tmp/perfectday-source.zip
-          retention-days: 7
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run check
+      - name: Package review runtime
+        if: ${{ hashFiles('scripts/verify-ui.cjs') == '' }}
+        run: tar -czf /tmp/review-runtime.tgz node_modules .next
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles('scripts/verify-ui.cjs') == '' }}
+        with:
+          name: review-runtime
+          path: /tmp/review-runtime.tgz
+          retention-days: 1
+      - name: Install browser review dependencies
+        if: ${{ hashFiles('scripts/verify-ui.cjs') != '' }}
+        run: |
+          npm install --no-save --package-lock=false @playwright/test @axe-core/playwright
+          npx playwright install --with-deps chromium
+      - name: Review responsive layouts and interactions
+        if: ${{ hashFiles('scripts/verify-ui.cjs') != '' }}
+        run: node scripts/verify-ui.cjs
+      - name: Package tracked source
+        if: always()
+        run: git archive --format=zip HEAD -o /tmp/perfectday-source.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perfectday-source
+          path: /tmp/perfectday-source.zip
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && hashFiles('scripts/verify-ui.cjs') != '' }}
+        with:
+          name: ui-review-screenshots
+          path: artifacts/ui-review
+          retention-days: 14
